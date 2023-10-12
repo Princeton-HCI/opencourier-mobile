@@ -27,6 +27,11 @@ export const Router = () => {
         component={MainStack}
         options={DEFAULT_OPTIONS}
       />
+      {/* <RootStack.Screen
+        name={RootScreen.Organization}
+        component={MainStack}
+        options={DEFAULT_OPTIONS}
+      /> */}
     </RootStack.Navigator>
   );
 };

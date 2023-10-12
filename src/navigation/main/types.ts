@@ -3,15 +3,19 @@ import { NavigationProp, RouteProp } from '@react-navigation/native';
 
 export enum MainScreens {
   Drawer = 'Drawer',
-  SelectOrganizationModal = 'SelectOrganizationModal',
+  OrganizationFlow = 'OrganizationFlow',
+  // SelectOrganizationModal = 'SelectOrganizationModal',
+  // SearchOrganization = 'SearchOrganization',
 }
 
 export type MainStackParamList = {
   Drawer: undefined;
-  SelectOrganizationModal: {
-    preselected: Organization;
-    onOrganizationSelect: (org: Organization) => void;
-  };
+  OrganizationFlow: undefined;
+  // SelectOrganizationModal: {
+  //   preselected: Organization;
+  //   onOrganizationSelect: (org: Organization) => void;
+  // };
+  // SearchOrganization: undefined;
 };
 
 export type MainNavigationProp = NavigationProp<MainStackParamList>;

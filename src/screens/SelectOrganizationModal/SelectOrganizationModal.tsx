@@ -2,13 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { View, Image, TouchableOpacity, Text, FlatList } from 'react-native';
 import { Images } from '@app/utilities/images';
 import { styles } from './SelectOrganizationModal.styles';
-import { MainScreenProp, MainScreens } from '@app/navigation/main/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Organization } from '@app/types/types';
 import { OrganizationCell } from '@app/components/OrganizationCell/OrganizationCell';
 import { TEST_ORG_ARRAY } from '@app/utilities/testData';
+import {
+  OrganizationScreenProp,
+  OrganizationScreens,
+} from '@app/navigation/organizationNavigation/types';
 
-type Props = MainScreenProp<MainScreens.SelectOrganizationModal>;
+type Props =
+  OrganizationScreenProp<OrganizationScreens.SelectOrganizationModal>;
 
 export const SelectOrganizationModal = ({ navigation, route }: Props) => {
   const { bottom } = useSafeAreaInsets();
@@ -52,7 +56,11 @@ export const SelectOrganizationModal = ({ navigation, route }: Props) => {
         <View style={[styles.contentButton, { paddingBottom: bottom }]}>
           <TouchableOpacity
             style={styles.buttonAdd}
-            onPress={() => navigation.goBack()}>
+            onPress={() =>
+              navigation.navigate(OrganizationScreens.SearchOrganization, {
+                onOrganizationSelect: onOrganizationSelect,
+              })
+            }>
             <Image source={Images.Plus} style={styles.plus} />
             <Text style={styles.textAdd}>Add organization</Text>
           </TouchableOpacity>

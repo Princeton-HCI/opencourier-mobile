@@ -2,14 +2,17 @@ import { Colors } from '@app/styles/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  safe: {
+    flex: 1,
     backgroundColor: Colors.white,
-    borderColor: Colors.gray1,
-    borderWidth: 1,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  },
+  content: {
+    paddingHorizontal: 16,
+  },
+  backButton: {
+    marginBottom: 16,
+  },
+  searchBar: {
+    marginHorizontal: 0,
   },
 });
