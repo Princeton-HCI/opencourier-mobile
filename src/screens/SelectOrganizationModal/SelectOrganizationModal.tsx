@@ -6,13 +6,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Organization } from '@app/types/types';
 import { OrganizationCell } from '@app/components/OrganizationCell/OrganizationCell';
 import { TEST_ORG_ARRAY } from '@app/utilities/testData';
-import {
-  OrganizationScreenProp,
-  OrganizationScreens,
-} from '@app/navigation/organizationNavigation/types';
+import { RootScreen, RootScreenProp } from '@app/navigation/types';
 
-type Props =
-  OrganizationScreenProp<OrganizationScreens.SelectOrganizationModal>;
+type Props = RootScreenProp<RootScreen.SelectOrganizationModal>;
 
 export const SelectOrganizationModal = ({ navigation, route }: Props) => {
   const { bottom } = useSafeAreaInsets();
@@ -57,7 +53,7 @@ export const SelectOrganizationModal = ({ navigation, route }: Props) => {
           <TouchableOpacity
             style={styles.buttonAdd}
             onPress={() =>
-              navigation.navigate(OrganizationScreens.SearchOrganization, {
+              navigation.navigate(RootScreen.SearchOrganization, {
                 onOrganizationSelect: onOrganizationSelect,
               })
             }>

@@ -15,9 +15,7 @@ export const HomeScreen = ({ navigation }: Props) => {
   const [searchText, setSearchText] = useState<string>('');
 
   const onProfilePress = () => {
-    setUserStatus(
-      userStatus === UserStatus.Online ? UserStatus.Offline : UserStatus.Online,
-    );
+    navigation.toggleDrawer();
   };
 
   const emptyState = useMemo(() => {

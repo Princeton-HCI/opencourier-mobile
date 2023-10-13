@@ -71,12 +71,9 @@ export const SideMenu = ({ navigation }: Props) => {
           style={styles.cell}
           organization={selectedOrg}
           onPress={() =>
-            navigation.navigate(MainScreens.OrganizationFlow, {
-              screen: OrganizationScreens.SelectOrganizationModal,
-              params: {
-                preselected: selectedOrg,
-                onOrganizationSelect: organizationSelected,
-              },
+            navigation.navigate(RootScreen.SelectOrganizationModal, {
+              preselected: selectedOrg,
+              onOrganizationSelect: organizationSelected,
             })
           }
           onSearch={() => undefined}

@@ -1,15 +1,12 @@
 import React from 'react';
 import { View, SafeAreaView } from 'react-native';
 import { styles } from './SearchOrganization.styles';
-import {
-  OrganizationScreenProp,
-  OrganizationScreens,
-} from '@app/navigation/organizationNavigation/types';
 import { BackNavButton } from '@app/components/BackNavButton/BackNavButton';
 import { OrganizationEmptyState } from '@app/components/OrganizationEmptyState/OrganizationEmptyState';
 import { SearchBar } from '@app/components/SearchBar/SearchBar';
+import { RootScreen, RootScreenProp } from '@app/navigation/types';
 
-type Props = OrganizationScreenProp<OrganizationScreens.SearchOrganization>;
+type Props = RootScreenProp<RootScreen.SearchOrganization>;
 
 export const SearchOrganization = ({ navigation }: Props) => {
   return (
