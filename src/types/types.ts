@@ -59,4 +59,5 @@ export type Order = {
   deliveredTo: User;
   restaurant: Restaurant;
   price: number;
+  notes?: string[];
 };

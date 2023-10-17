@@ -14,6 +14,7 @@ import { TEST_NEW_ORDERS, TEST_ORDERS_HISTORY } from '@app/utilities/testData';
 import { HistoryCell } from '@app/components/HistoryCell/HistoryCell';
 import { NewOrderCell } from '@app/components/NewOrderCell/NewOrderCell';
 import { getAutoAcceptOrdersStorage } from '@app/utilities/storage';
+import { InProgressCell } from '@app/components/InProgressCell/InProgressCell';
 
 type Props = DrawerScreenProp<DrawerScreens.Home>;
 
@@ -25,6 +26,9 @@ export const HomeScreen = ({ navigation }: Props) => {
   const [dataSourceHistory, setDataSourceHistory] =
     useState<Order[]>(TEST_ORDERS_HISTORY);
   const [dataSourceNew, setDataSourceNew] = useState<Order[]>(TEST_NEW_ORDERS);
+  const [dataSourceInProgress, setDataSourceInProgress] =
+    useState<Order[]>(TEST_NEW_ORDERS);
+
   const [dataSource, setDataSource] = useState<Order[]>([]);
   const [autoAcceptOrders, setAutoAcceptOrders] = useState<boolean>(false);
 
@@ -50,11 +54,11 @@ export const HomeScreen = ({ navigation }: Props) => {
       case HomeTabItem.New:
         return dataSourceNew.length === 0;
       case HomeTabItem.InProgress:
-        return true;
+        return dataSourceInProgress.length === 0;
       case HomeTabItem.History:
         return dataSourceHistory.length === 0;
     }
-  }, [selectedTab, dataSourceHistory, dataSourceNew]);
+  }, [selectedTab, dataSourceHistory, dataSourceNew, dataSourceInProgress]);
 
   useEffect(() => {
     switch (selectedTab) {
@@ -62,12 +66,13 @@ export const HomeScreen = ({ navigation }: Props) => {
         setDataSource(dataSourceNew);
         break;
       case HomeTabItem.InProgress:
+        setDataSource(dataSourceInProgress);
         break;
       case HomeTabItem.History:
         setDataSource(dataSourceHistory);
         break;
     }
-  }, [selectedTab, dataSourceHistory, dataSourceNew]);
+  }, [selectedTab, dataSourceHistory, dataSourceNew, dataSourceInProgress]);
 
   const renderItem = ({ item }: { item: Order }) => {
     switch (selectedTab) {
@@ -81,7 +86,17 @@ export const HomeScreen = ({ navigation }: Props) => {
           />
         );
       case HomeTabItem.InProgress:
-        return <HistoryCell order={item} onPress={() => undefined} />;
+        return (
+          <InProgressCell
+            onChatCustomer={() => undefined}
+            onChatRestaurant={() => undefined}
+            onConfirmItems={() => undefined}
+            onContactCustomer={() => undefined}
+            onContactRestaurant={() => undefined}
+            onMarkAsDelivered={() => undefined}
+            order={item}
+          />
+        );
       case HomeTabItem.History:
         setDataSource(dataSourceHistory);
         return <HistoryCell order={item} onPress={() => undefined} />;

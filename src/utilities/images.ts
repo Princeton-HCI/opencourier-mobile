@@ -31,6 +31,11 @@ import houseGray from '@app/assets/icons/HouseLine.png';
 import chats from '@app/assets/icons/ChatsCircle.png';
 import distance from '@app/assets/icons/Path.png';
 import clock from '@app/assets/icons/ClockAfternoon.png';
+import caretDown from '@app/assets/icons/CaretUp.png';
+import PhoneOutgoing from '@app/assets/icons/PhoneOutgoing.png';
+import Hamburger from '@app/assets/icons/Hamburger.png';
+import CheckFat from '@app/assets/icons/CheckFat.png';
+import PlusCircle from '@app/assets/icons/Content.png';
 
 export const Images = {
   Logo: logo,
@@ -65,4 +70,9 @@ export const Images = {
   Chats: chats,
   Distance: distance,
   Clock: clock,
+  CaretDown: caretDown,
+  PhoneOutgoing: PhoneOutgoing,
+  Hamburger: Hamburger,
+  CheckFat: CheckFat,
+  PlusCircle: PlusCircle,
 };

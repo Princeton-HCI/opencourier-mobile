@@ -95,6 +95,7 @@ export const TEST_NEW_ORDERS: Order[] = [
       address: 'Street Number 5, Region, Country, ZIPCODE',
     },
     price: 11.21,
+    notes: ['Note 1', 'Note 2'],
   },
   {
     id: 'id2',
