@@ -16,7 +16,7 @@
     "@react-navigation/native-stack": "^6.9.14",
     "react": "18.1.0",
     "react-native": "0.70.10",
-    "react-native-gesture-handler": "^2.13.1",
+    "react-native-gesture-handler": "^1.8.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-page-indicator": "^2.2.0",
     "react-native-pager-view": "^6.2.1",

@@ -11,7 +11,9 @@ import { styles } from './InProgressCell.styles';
 import { Order } from '@app/types/types';
 import { Images } from '@app/utilities/images';
 import { Button, ButtonType } from '../Button/Button';
-import { InstructionCell } from '../InstructionCell/InstructionCell';
+import { PickupInstructionCell } from '../PickupInstructionsCell/PickupInstructionCell';
+import { DeliveryInstructionsCell } from '../DeliveryInstructionsCell/DeliveryInstructionsCell';
+import { NoteCell } from '../NoteCell/NoteCell';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
@@ -77,17 +79,17 @@ export const InProgressCell = ({
                 </View>
               </TouchableOpacity>
             </View>
+            {order.restaurantNotes && (
+              <View style={styles.containerNotes}>
+                {order.restaurantNotes.map(note => {
+                  return <NoteCell text={note} />;
+                })}
+              </View>
+            )}
             <View style={styles.containerInstructions}>
-              {order.notes &&
-                order.notes.map(item => {
-                  return (
-                    <InstructionCell
-                      text={item}
-                      // leadingIcon={null}
-                      trailingBoldText={'4'}
-                      topRightRestaurantIcon
-                    />
-                  );
+              {order.pickupInstructions &&
+                order.pickupInstructions.map(item => {
+                  return <PickupInstructionCell instruction={item} />;
                 })}
               <TouchableOpacity style={styles.buttonAddNote}>
                 <Image source={Images.PlusCircle} />
@@ -96,6 +98,7 @@ export const InProgressCell = ({
             </View>
 
             <Button
+              textStyle={{ fontSize: 20, fontWeight: '700' }}
               style={styles.buttonTop}
               type={ButtonType.black}
               icon={Images.PhoneOutgoing}
@@ -103,6 +106,7 @@ export const InProgressCell = ({
               onPress={() => onContactRestaurant(order)}
             />
             <Button
+              textStyle={{ fontSize: 20, fontWeight: '700' }}
               type={ButtonType.green}
               icon={Images.Hamburger}
               title="Confirm items"
@@ -159,21 +163,23 @@ export const InProgressCell = ({
                 </View>
               </TouchableOpacity>
             </View>
-            <View style={styles.containerInstructions}>
-              {order.notes &&
-                order.notes.map(item => {
-                  return (
-                    <InstructionCell
-                      text={item}
-                      // leadingIcon={null}
-                      trailingBoldText={'4'}
-                      topRightRestaurantIcon
-                    />
-                  );
+            {order.clientNotes && (
+              <View style={styles.containerNotes}>
+                {order.clientNotes.map(note => {
+                  return <NoteCell text={note} />;
                 })}
-            </View>
+              </View>
+            )}
+            {order.deliveryInstructions && (
+              <View style={styles.containerInstructions}>
+                {order.deliveryInstructions.map(item => {
+                  return <DeliveryInstructionsCell type={item} />;
+                })}
+              </View>
+            )}
 
             <Button
+              textStyle={{ fontSize: 20, fontWeight: '700' }}
               style={styles.buttonTop}
               type={ButtonType.black}
               icon={Images.PhoneOutgoing}
@@ -181,6 +187,7 @@ export const InProgressCell = ({
               onPress={() => onContactCustomer(order)}
             />
             <Button
+              textStyle={{ fontSize: 20, fontWeight: '700' }}
               type={ButtonType.gray}
               icon={Images.CheckFat}
               title="Mark as delivered"

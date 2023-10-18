@@ -78,6 +78,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginBottom: 8,
   },
   verticalLine: {
     width: 3,
@@ -103,7 +104,10 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   containerInstructions: {
-    marginTop: 16,
+    marginTop: 4,
+  },
+  containerNotes: {
+    marginTop: 8,
   },
   instruction: {
     borderWidth: 1,
@@ -128,9 +132,10 @@ export const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 5,
     paddingVertical: 4,
-    backgroundColor: Colors.gray4,
+    backgroundColor: Colors.gray6,
     flexDirection: 'row',
     marginVertical: 5,
+    alignSelf: 'flex-start',
   },
   textAddNote: {
     fontSize: 14,

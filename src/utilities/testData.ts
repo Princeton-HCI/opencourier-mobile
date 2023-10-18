@@ -1,4 +1,10 @@
-import { Order, OrderStatus, Organization } from '@app/types/types';
+import {
+  Order,
+  OrderStatus,
+  Organization,
+  DeliveryType,
+  PickupType,
+} from '@app/types/types';
 
 export const TEST_IMAGE_URL =
   'https://w7.pngwing.com/pngs/380/764/png-transparent-paper-box-computer-icons-symbol-random-icons-miscellaneous-angle-text.png';
@@ -95,23 +101,20 @@ export const TEST_NEW_ORDERS: Order[] = [
       address: 'Street Number 5, Region, Country, ZIPCODE',
     },
     price: 11.21,
-    notes: ['Note 1', 'Note 2'],
-  },
-  {
-    id: 'id2',
-    deliveredTo: {
-      address: 'Street Number 5, Region, Country, ZIPCODE',
-      firstname: 'User 1',
-      lastname: '',
-      profilePictureUrl:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVA_HrQLjkHiJ2Ag5RGuwbFeDKRLfldnDasw&usqp=CAU',
-    },
-    date: Date(),
-    status: OrderStatus.Delivered,
-    restaurant: {
-      name: 'Restaurant 3',
-      address: 'Street Number 5, Region, Country, ZIPCODE',
-    },
-    price: 512.21,
+    restaurantNotes: ['Restaurant Note 1', 'Restaurant Note 2'],
+    clientNotes: ['Client Note 1', 'Client Note 2'],
+    pickupInstructions: [
+      { type: PickupType.CallOnArrival },
+      { type: PickupType.DontOpenBags },
+      { type: PickupType.ParkThirdPartyLot, count: 3 },
+      { type: PickupType.LineupThirdPartyPickup, count: 3 },
+    ],
+    deliveryInstructions: [
+      DeliveryType.CallOnArrival,
+      DeliveryType.LeaveAtDoor,
+      DeliveryType.MeetAtDoor,
+      DeliveryType.MeetInside,
+      DeliveryType.MeetOutside,
+    ],
   },
 ];
