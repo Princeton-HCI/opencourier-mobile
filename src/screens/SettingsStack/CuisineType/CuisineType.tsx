@@ -8,42 +8,44 @@ import {
   SettingsCell,
   SettingsCellType,
 } from '@app/components/SettingsCell/SettingsCell';
-import { selectUser, updateUserSettings } from '@app/redux/user/user';
-import { useDispatch, useSelector } from 'react-redux';
 import { CuisineTypes } from '@app/types/enums';
+import useUserSettings from '@app/hooks/useUserSetttings';
 
 type Props = MainScreenProp<MainScreens.CuisineTypeScreen>;
 
 export const CuisineTypeScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  const user = useSelector(selectUser);
-  const dispatch = useDispatch();
-  const [selectedCuisine, setSelectedCuisine] = useState<string | null>(
-    user.settings?.cuisineTypes && user.settings.cuisineTypes.length > 0 ? user.settings.cuisineTypes[0] : null
+  const { settings, updateSettings, isUpdating } = useUserSettings();
+
+  const [selectedCuisine, setSelectedCuisine] = useState<string[]>(
+    settings?.cuisineTypes ?? [],
   );
-  const cuisines = Object.keys(CuisineTypes).filter((item) => {
+  const cuisines = Object.keys(CuisineTypes).filter(item => {
     return isNaN(Number(item));
   });
 
   const onSelect = (cuisine: string) => {
-    setSelectedCuisine(cuisine);
-    dispatch(updateUserSettings({id: user.user!.id, settings: {cuisineTypes: [cuisine as unknown as CuisineTypes]}}))
+    if (isUpdating) {
+      return;
+    }
+    let result = [];
+    if (selectedCuisine.indexOf(cuisine) !== -1) {
+      result = selectedCuisine.filter(item => item !== cuisine);
+    } else {
+      result = [...selectedCuisine, cuisine];
+    }
+    setSelectedCuisine(result);
+    updateSettings({ cuisineTypes: result });
   };
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: string;
-    index: number;
-  }) => {
+  const renderItem = ({ item }: { item: string; index: number }) => {
     return (
       <SettingsCell
         style={{ marginBottom: 16 }}
         title={item}
         cellType={SettingsCellType.radioButton}
         onSelect={onSelect}
-        isSelected={selectedCuisine === item}
+        isSelected={selectedCuisine.indexOf(item) !== -1}
       />
     );
   };

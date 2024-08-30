@@ -18,8 +18,6 @@ import {
   SettingsCell,
   SettingsCellType,
 } from '@app/components/SettingsCell/SettingsCell';
-import { useDispatch, useSelector } from 'react-redux';
-import { getUserSettings, selectUser } from '@app/redux/user/user';
 
 type SectionListItem = {
   cellType: SettingsCellType;
@@ -141,15 +139,6 @@ export const SettingsScreen = ({ navigation }: Props) => {
       title: t('translations:Dev'),
     },
   ];
-
-  const dispatch = useDispatch();
-  const { user } = useSelector(selectUser);
-
-  useEffect(() => {
-    console.log('Dispatching get user settings');
-    dispatch(getUserSettings({ id: user!.id }));
-    //pullToken();
-  }, []);
 
   const pullToken = async () => {
     const fcmToken = await messaging().getToken();

@@ -21,6 +21,7 @@ import { TEST_INSTANCES } from '@app/utilities/testData';
 import { InstanceCell } from '@app/components/InstanceCell/InstanceCell';
 import { Instance } from '@app/types/types';
 import { client } from '@app/services/Client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = OnboardingScreenProp<OnboardingScreen.Welcome>;
 
@@ -28,9 +29,10 @@ export const WelcomeScreen = ({ navigation }: Props) => {
   const { t, i18n } = useTranslation();
   const [text, setText] = useState<string>('');
 
-  const onInstancePress = (instance: Instance) => {
+  const onInstancePress = async (instance: Instance) => {
     console.log('Setting base url:', instance.link);
     client.defaults.baseURL = instance.link;
+    await AsyncStorage.setItem('BASE_URL', instance.link);
     navigation.navigate(OnboardingScreen.InstanceDetails, {
       instance: instance,
     });

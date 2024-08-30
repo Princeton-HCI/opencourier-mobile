@@ -8,28 +8,21 @@ import {
   Image,
 } from 'react-native';
 import { styles } from './InProgressNotes.styles';
-import { Comment, CourierTip, Order } from '@app/types/types';
+import { CourierTip, Note, Order } from '@app/types/types';
 import { PickupInstructionCell } from '../PickupInstructionsCell/PickupInstructionCell';
 import { Images } from '@app/utilities/images';
-import { selectUser } from '@app/redux/user/user';
-import { useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { RootNavigationProp, RootScreen } from '@app/navigation/types';
+import useComment from '@app/hooks/useComment';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
   order: Order;
-  notes: Comment[] | string[];
+  notes: Note[] | string[];
   headerTitle: string;
-  onNotePress: (note: Comment) => void;
-  onNoteEdit?: (note: Comment) => void;
-  onNoteDelete?: (note: Comment) => void;
-  onNoteAdd?: () => void;
+  type?: 'merchant' | 'location';
   expanded: boolean;
   noteCreationDisabled: boolean;
-  onUpvote?: (note: Comment) => void;
-  onDownvote?: (note: Comment) => void;
-  //TEMP
-  upvotedNoteIds: string[];
-  downvotedNoteIds: string[];
 };
 
 export const InProgressNotes = ({
@@ -37,18 +30,35 @@ export const InProgressNotes = ({
   notes,
   order,
   headerTitle,
-  onNotePress,
-  onNoteEdit,
-  onNoteDelete,
-  onNoteAdd,
+  type,
   expanded,
   noteCreationDisabled = true,
-  onUpvote,
-  onDownvote,
-  upvotedNoteIds,
-  downvotedNoteIds,
 }: Props) => {
-  const { user } = useSelector(selectUser);
+  const navigation = useNavigation<RootNavigationProp>();
+  const { createComment } = useComment();
+
+  const onNoteAdded = (
+    text: string,
+    type2: 'merchant' | 'location',
+    noteOrder: Order,
+  ) => {
+    createComment({
+      note: text,
+      locationId:
+        type === 'merchant'
+          ? noteOrder.pickupLocationId
+          : noteOrder.dropoffLocationId,
+      deliveryId: noteOrder.id,
+    });
+  };
+
+  const onNoteAdd = () => {
+    navigation.navigate(RootScreen.AddNoteModal, {
+      onNoteAdded: onNoteAdded,
+      order: order,
+      type: type,
+    });
+  };
 
   return (
     <View
@@ -62,42 +72,14 @@ export const InProgressNotes = ({
         <Text style={styles.textNotesHeader}>{headerTitle}</Text>
         <View style={styles.notesDash} />
         {!noteCreationDisabled && (
-          <TouchableOpacity
-            style={styles.addNote}
-            onPress={() => onNoteAdd && onNoteAdd()}>
+          <TouchableOpacity style={styles.addNote} onPress={onNoteAdd}>
             <Image source={Images.PlusBlack} />
           </TouchableOpacity>
         )}
       </View>
       <View style={[styles.containerInstructions]}>
         {notes.map(note => {
-          return (
-            <PickupInstructionCell
-              editDisabled={
-                typeof note == 'string' || note.commentor != user?.id
-              }
-              upvoted={
-                typeof note != 'string' && upvotedNoteIds?.includes(note.id)
-              }
-              downvoted={
-                typeof note != 'string' && downvotedNoteIds?.includes(note.id)
-              }
-              endorsed={
-                typeof note != 'string' &&
-                note?.likers?.find(liker => liker == user!.id) != undefined
-              }
-              note={note}
-              onPress={note => typeof note !== 'string' && onNotePress(note)}
-              onDelete={note =>
-                typeof note !== 'string' && onNoteDelete && onNoteDelete(note)
-              }
-              onEdit={note =>
-                typeof note !== 'string' && onNoteEdit && onNoteEdit(note)
-              }
-              onUpvote={onUpvote}
-              onDownvote={onDownvote}
-            />
-          );
+          return <PickupInstructionCell note={note} />;
         })}
       </View>
     </View>

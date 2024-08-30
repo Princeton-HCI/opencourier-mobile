@@ -11,24 +11,21 @@ import usePushNotifications from '@app/services/notifications';
 import { AddNote } from '@app/screens/AddNote/AddNote';
 import { DeleteNote } from '@app/screens/DeleteNote/DeleteNote';
 import { DatePickerScreen } from '@app/screens/DatePicker/DatePicker';
-import User from '@app/context/userContext';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectUser, updateUser } from '@app/redux/user/user';
 import { track } from '@app/utilities/geo';
 import { Point } from 'geojson';
 import Geolocation from 'react-native-geolocation-service';
 import { useLocationPermission } from '@app/hooks/useLocationPermission';
 import UserContext from '@app/context/userContext';
+import useUser from '@app/hooks/useUser';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const DEFAULT_OPTIONS = { headerShown: false };
 
 export const Router = () => {
-  const { user } = useSelector(selectUser)
+  const { user, updateUserLocation } = useUser();
   const { setWatchId, watchId } = useContext(UserContext);
   const { locationPermission } = useLocationPermission();
-  const dispatch = useDispatch();
 
   // usePushNotifications(true);
   // if (user.isLoading) {
@@ -41,24 +38,36 @@ export const Router = () => {
 
   useEffect(() => {
     if (!user || !locationPermission) {
-      console.log("Location Tracking Disabled")
+      console.log('Location Tracking Disabled');
       watchId && Geolocation.clearWatch(watchId);
       setWatchId(undefined);
     } else if (!watchId) {
-      console.log("Location Tracking Enabled")
-      const newWatchId = track((currentLocation: Point) => dispatch(updateUser({ id: user.id, data: { currentLocation } })));
-      setWatchId(newWatchId)
+      console.log('Location Tracking Enabled');
+      const newWatchId = track((currentLocation: Point) =>
+        updateUserLocation({
+          latitude: currentLocation.coordinates[1],
+          longitude: currentLocation.coordinates[0],
+        }),
+      );
+      setWatchId(newWatchId);
     }
   }, [locationPermission, user?.id]);
 
   return (
     <RootStack.Navigator>
       {!user ? (
-        <RootStack.Screen
-          name={RootScreen.Onboarding}
-          component={OnboardingStack}
-          options={DEFAULT_OPTIONS}
-        />
+        <>
+          <RootStack.Screen
+            name={RootScreen.Loading}
+            component={LoadingScreen}
+            options={DEFAULT_OPTIONS}
+          />
+          <RootStack.Screen
+            name={RootScreen.Onboarding}
+            component={OnboardingStack}
+            options={DEFAULT_OPTIONS}
+          />
+        </>
       ) : (
         <>
           <RootStack.Screen

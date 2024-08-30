@@ -13,9 +13,9 @@ import {
 import { Settings } from 'react-native';
 
 export enum UserStatus {
-  Online = 'online',
-  Offline = 'offline',
-  LastCall = 'last_call',
+  Online = 'ONLINE',
+  Offline = 'OFFLINE',
+  LastCall = 'LAST_CALL',
 }
 
 export enum HomeTabItem {
@@ -101,17 +101,32 @@ export type Organization = {
   iconUrl?: string;
 };
 
-export type User = {
+export type Courier = {
   id: string;
-  firstname: string;
-  lastname: string;
+  node_uri: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
   status: UserStatus;
-  orderSetting: OrderSetting;
-  profilePictureUrl?: string;
-  address?: string;
-  location?: Point | null;
-  rejectedOrders: string[];
+  deliverySetting: string;
+  userId: string;
+  createdAt: string;
 };
+
+export type UserResponse = {
+  error: boolean;
+  result: {
+    id: string;
+    email: string;
+    role: string[];
+    courier: Courier;
+  };
+};
+
+export type User = {
+  email: string;
+  role: string[];
+} & Courier;
 
 export type Setting = {
   deliveryPolygon?: Polygon | null;
@@ -145,7 +160,7 @@ export type Comment = {
   commentor: string;
 };
 
-export type Order = {
+export type OldOrder = {
   date: string;
   id: string;
   //order_id?: string;
@@ -180,6 +195,234 @@ export type Order = {
   // restaurantNotes?: string[];
   // clientNotes?: string[];
   items: Item[];
+};
+
+/*
+  "id":"cm0dsvrrx001bqpo09efatw2h",
+   "pickupName":"Store Name",
+   "pickupPhoneNumber":"+15555555555",
+   "pickupBusinessName":"Store Name",
+   "pickupNotes":"Follow big green 'Pickup' signs in the parking lot",
+   "pickupVerification":{
+      "signature":true,
+      "signatureRequirement":{
+         "enabled":true,
+         "collectSignerName":true,
+         "collectSignerRelationship":true
+      },
+      "barcodes":[
+         {
+            "value":"string",
+            "type":"CODE39"
+         }
+      ],
+      "identification":{
+         "minAge":21,
+         "noSobrietyCheck":true
+      },
+      "picture":true
+   },
+   "pickupLocationId":"cm0dsrfci0000qpo0bx6vchmc",
+   "pickupReadyAt":"2024-12-12T14:00:00.000Z",
+   "pickupDeadlineAt":"2024-12-12T14:30:00.000Z",
+   "dropoffName":"Gordon Shumway",
+   "dropoffPhoneNumber":"+15555555555",
+   "dropoffBusinessName":"House of Luciano",
+   "dropoffNotes":"Second floor, black door to the right.",
+   "dropoffSellerNotes":"Fragile content - please handle the box with care during delivery.",
+   "dropoffVerification":{
+      "signature":true,
+      "signatureRequirement":{
+         "enabled":true,
+         "collectSignerName":true,
+         "collectSignerRelationship":true
+      },
+      "barcodes":[
+         {
+            "value":"string",
+            "type":"CODE39"
+         }
+      ],
+      "pincode":{
+         "enabled":true,
+         "type":"merchant_provided",
+         "value":"string"
+      },
+      "identification":{
+         "minAge":21,
+         "noSobrietyCheck":true
+      },
+      "picture":true
+   },
+   "dropoffReadyAt":"2024-12-12T14:30:00.000Z",
+   "dropoffEta":"2024-12-12T14:03:32.400Z",
+   "dropoffDeadlineAt":"2024-12-12T16:00:00.000Z",
+   "deliverableAction":"MEET_AT_DOOR",
+   "undeliverableAction":"LEAVE_AT_DOOR",
+   "undeliverableReason":null,
+   "dropoffLocationId":"cm0dsrfcm0001qpo0qn54wno1",
+   "deliveryTypes":[
+      
+   ],
+   "requiresDropoffSignature":true,
+   "requiresId":false,
+   "orderReference":"REF0000002",
+   "orderTotalValue":1000,
+   "orderItems":[
+      {
+         "name":"Bow tie",
+         "quantity":1,
+         "size":"small",
+         "dimensions":{
+            "length":20,
+            "height":20,
+            "depth":20
+         },
+         "price":100,
+         "weight":300,
+         "vatPercentage":1250000
+      }
+   ],
+   "status":"ACCEPTED",
+   "customerNotes":[
+      
+   ],
+   "currencyCode":"USD",
+   "totalCost":3.213,
+   "fee":0.292,
+   "pay":null,
+   "tips":500,
+   "totalCompensation":2.921,
+   "pickupTypes":[
+      
+   ],
+   "imageType":null,
+   "imageName":null,
+   "imageData":null,
+   "idempotencyKey":"12322422",
+   "externalStoreId":"my_store_123",
+   "returnVerification":{
+      "signature":true,
+      "signatureRequirement":{
+         "enabled":true,
+         "collectSignerName":true,
+         "collectSignerRelationship":true
+      },
+      "barcodes":[
+         {
+            "value":"string",
+            "type":"CODE39"
+         }
+      ],
+      "picture":true,
+      "pincode":{
+         "enabled":true,
+         "type":"merchant_provided",
+         "value":"string"
+      }
+   },
+   "externalUserInfo":null,
+   "externalId":"1234567890",
+   "courierId":"cm029az8p0005qplfb2h9zp0h",
+   "partnerId":"cm040ibwv001vqpyqblmpmn12",
+   "deliveryQuoteId":"cm0dsvoj00019qpo0wf5cbg5h",
+   "createdAt":"2024-08-28T11:56:21.981Z"
+*/
+
+export type Verification = {
+  signature: boolean;
+  signatureRequirement: {
+    enabled: boolean;
+    collectSignerName: boolean;
+    collectSignerRelationship: boolean;
+  };
+  barcodes: {
+    value: string;
+    type: string;
+  }[];
+  identification: {
+    minAge: number;
+    noSobrietyCheck: boolean;
+  };
+  picture: boolean;
+};
+
+export type Note = {
+  id: string;
+  note: string;
+  courierId: string;
+  actor: string;
+  locationId: string;
+  deliveryId: string;
+  createdAt: string;
+};
+
+export type OrderItem = {
+  name: string;
+  quantity: number;
+  size: string;
+  dimensions: {
+    length: string;
+    height: string;
+    depth: string;
+  };
+  price: number;
+  weight: number;
+  vatPercentage: number;
+};
+
+export type Order = {
+  id: string;
+  pickupName: string;
+  pickupPhoneNumber: string;
+  pickupBusinessName: string;
+  pickupNotes: string;
+  pickupVerification: Verification;
+  pickupLocationId: string;
+  pickupReadyAt: string;
+  pickupDeadlineAt: string;
+  dropoffName: string;
+  dropoffPhoneNumber: string;
+  dropoffBusinessName: string;
+  dropoffNotes: string;
+  dropoffSellerNotes: string;
+  dropoffVerification: Verification;
+  dropoffReadyAt: string;
+  dropoffEta: string;
+  dropoffDeadlineAt: string;
+  deliverableAction: string;
+  undeliverableAction: string;
+  undeliverableReason?: string;
+  dropoffLocationId: string;
+  deliveryTypes: string[];
+  requiresDropoffSignature: string;
+  requiresId: boolean;
+  orderReference: string;
+  orderTotalValue: number;
+  orderItems: OrderItem[];
+  status: string;
+  customerNotes: string[];
+  currencyCode: string;
+  totalCost: number;
+  fee: number;
+  pay?: any;
+  tips?: number;
+  totalCompensation: number;
+  pickupTypes: string[];
+  imageType?: any;
+  imageName?: any;
+  imageDate?: any;
+  idempotencyKey: string;
+  externalStoreId: string;
+  returnVerification: Verification;
+  externalUserInfo?: any;
+  externalId: string;
+  courierId: string;
+  partnerId: string;
+  deliveryQuoteId: string;
+  createdAt: string;
+  pickupLocationNotes: Note[];
+  dropOffLocationNotes: Note[];
 };
 
 export type PickupruInstruction = {

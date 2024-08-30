@@ -39,9 +39,9 @@ export const AddNote = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     if (noteToEdit !== undefined) {
-      setNote(noteToEdit.text);
+      setNote(noteToEdit.note);
     }
-  }, []);
+  }, [noteToEdit]);
 
   return (
     <View style={styles.container}>

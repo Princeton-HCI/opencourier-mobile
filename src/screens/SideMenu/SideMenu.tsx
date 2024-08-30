@@ -15,17 +15,18 @@ import {
   setSelectedOrganizationStorage,
 } from '@app/utilities/storage';
 import { DrawerScreens } from '@app/navigation/drawer/types';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout, updateUser } from '@app/redux/user/user';
 import { useTranslation } from 'react-i18next';
 import RNRestart from 'react-native-restart';
-import { selectUser } from '@app/redux/user/user';
 import { OrderSetting } from '@app/types/enums';
 import { useLocationPermission } from '@app/hooks/useLocationPermission';
 import { track } from '@app/utilities/geo';
 import { Point } from 'geojson';
 import UserContext from '@app/context/userContext';
 import Geolocation from 'react-native-geolocation-service';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useUser from '@app/hooks/useUser';
+import { useQueryClient } from '@tanstack/react-query';
+import { services } from '@app/services/service';
 
 type Props = RootScreenProp<RootScreen.Loading>;
 
@@ -41,20 +42,25 @@ const section2 = [
 
 export const SideMenu = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  const { user } = useSelector(selectUser);
+  const { user } = useUser();
   const { requestLocationPermission, locationPermission } =
     useLocationPermission();
   const [realTimeLocation, setRealTimeLocation] =
     useState<boolean>(locationPermission);
+
+  const queryClient = useQueryClient();
+
   const [autoAcceptOrders, setAutoAcceptOrders] = useState<boolean>(
-    user?.orderSetting == ('auto_accept' as unknown as OrderSetting),
+    user?.deliverySetting === OrderSetting.auto_accept,
   );
   const [selectedOrg, setSelectedOrg] = useState<Organization>(
     TEST_ORG_ARRAY[0],
   );
-  const [status, setStatus] = useState<UserStatus>(user!.status);
+  const [status, setStatus] = useState<string | undefined>(user?.status);
   const { watchId, setWatchId } = useContext(UserContext);
-  const dispatch = useDispatch();
+
+  const { updateStatus, updateDeliverySettings, updateUserLocation } =
+    useUser();
 
   const isSwitchOn = (item: SideMenuItem) => {
     switch (item) {
@@ -70,25 +76,20 @@ export const SideMenu = ({ navigation }: Props) => {
     switch (item) {
       case SideMenuItem.AutoOrders:
         //setAutoAcceptOrdersStorage(value);
-        dispatch(
-          updateUser({
-            id: user!.id,
-            data: {
-              orderSetting: (value
-                ? 'auto_accept'
-                : 'manual') as unknown as OrderSetting,
-            },
-          }),
-        );
+
+        updateDeliverySettings(value ? 'AUTO_ACCEPT' : 'MANUAL');
         setAutoAcceptOrders(value);
         break;
       case SideMenuItem.Location:
         if (value) {
           !locationPermission && requestLocationPermission();
           console.log('Location Tracking Enabled');
-          const newWatchId = track((currentLocation: Point) =>
-            dispatch(updateUser({ id: user!.id, data: { currentLocation } })),
-          );
+          const newWatchId = track((currentLocation: Point) => {
+            updateUserLocation({
+              latitude: currentLocation.coordinates[1],
+              longitude: currentLocation.coordinates[0],
+            });
+          });
           setWatchId!(newWatchId);
           setRealTimeLocation(value);
         } else {
@@ -119,12 +120,18 @@ export const SideMenu = ({ navigation }: Props) => {
   }, []);
 
   useEffect(() => {
-    setStatus(user!.status);
-  }, [user!.status]);
+    setStatus(user?.status);
+  }, [user]);
 
   useEffect(() => {
     setRealTimeLocation(locationPermission);
   }, [locationPermission]);
+
+  const onLogoutHandle = async () => {
+    await AsyncStorage.multiRemove(['token', 'BASE_URL']);
+    services.logout();
+    queryClient.resetQueries();
+  };
 
   const handlePress = (item: SideMenuItem) => {
     switch (item) {
@@ -144,7 +151,7 @@ export const SideMenu = ({ navigation }: Props) => {
         break;
       case SideMenuItem.Logout:
         Alert.alert('Notice', 'Are you sure you want to log out?', [
-          { text: 'Yes', onPress: () => dispatch(logout()) },
+          { text: 'Yes', onPress: onLogoutHandle },
           { text: 'Cancel', style: 'cancel' },
         ]);
 
@@ -161,9 +168,8 @@ export const SideMenu = ({ navigation }: Props) => {
     }
     navigation.navigate(RootScreen.UserStatusModal, {
       status: newStatus,
-      onAccept: newStatus => {
-        console.log('dispatching update user');
-        dispatch(updateUser({ id: user!.id, data: { status: newStatus } }));
+      onAccept: () => {
+        updateStatus(newStatus);
       },
       onCancel: () => undefined,
     });
@@ -179,7 +185,7 @@ export const SideMenu = ({ navigation }: Props) => {
             onPress={() => undefined}
           />
           <Text style={styles.textName}>
-            {t('translations:hi') + ` ${user!.firstname}!`}
+            {t('translations:hi') + ` ${user!.firstName}!`}
           </Text>
         </View>
         <OrganizationSelect

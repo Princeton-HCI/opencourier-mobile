@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleProp,
   ViewStyle,
@@ -12,12 +12,8 @@ import { styles } from './NewOrderCell.styles';
 import { Order } from '@app/types/types';
 import { ButtonOrder, ButtonOrderType } from '../ButtonOrder/ButtonOrder';
 import { Images } from '@app/utilities/images';
-import UserContext from '@app/context/userContext';
 import Map from '../Map/Map';
-import { RootState } from '@app/redux/store';
-import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { selectUser } from '@app/redux/user/user';
 import { metersToMiles } from '@app/utilities/geo';
 import { secondsToMinutes } from '@app/utilities/dates';
 import { getDistance } from '@app/utilities/geo';
@@ -28,6 +24,7 @@ import {
 } from '@app/utilities/constants';
 import { Paralelogram } from '../Paralelogram/Paralelogram';
 import { Colors } from '@app/styles/colors';
+import useUser from '@app/hooks/useUser';
 
 const PARALELOGRAM_WIDTH = 16;
 const PARALELOGRAM_HEIGHT = 8;
@@ -56,7 +53,7 @@ export const NewOrderCell = ({
   millisRemaining,
 }: Props) => {
   const { t } = useTranslation();
-  const { user } = useSelector(selectUser);
+  const { user } = useUser();
   const [distance, setDistance] = useState<number>(0); // meters
   const [duration, setDuration] = useState<number>(0); // seconds
   const numberOfParalelograms = Math.floor(SCREEN_WIDTH / PARALELOGRAM_WIDTH);
@@ -74,6 +71,7 @@ export const NewOrderCell = ({
   };
 
   useEffect(() => {
+    return;
     if (user!.location && order.pickup && order.dropoff) {
       const coordinates = [
         [user!.location.coordinates[0], user!.location.coordinates[1]],
@@ -89,9 +87,7 @@ export const NewOrderCell = ({
 
   return (
     <View style={[styles.container, style]}>
-      <Text style={styles.textPrice}>
-        {currencyFormatter(order.income?.pay)}
-      </Text>
+      <Text style={styles.textPrice}>{currencyFormatter(order.totalCost)}</Text>
       <View style={styles.separator} />
       <View style={styles.content}>
         <View style={styles.containerLeft}>
@@ -102,10 +98,8 @@ export const NewOrderCell = ({
         <View style={styles.containerRight}>
           <View style={styles.containerAddressButton}>
             <View style={styles.containerText}>
-              <Text style={styles.textName}>{order.merchant_name}</Text>
-              <Text style={styles.textAddress}>
-                {order.pickup.formattedAddress}
-              </Text>
+              <Text style={styles.textName}>{order.pickupBusinessName}</Text>
+              <Text style={styles.textAddress}>{order.pickupName}</Text>
             </View>
             <TouchableOpacity onPress={() => onCopyRestaurant(order)}>
               <View style={styles.containerChats}>
@@ -133,10 +127,8 @@ export const NewOrderCell = ({
           </View>
           <View style={styles.containerAddressButton}>
             <View style={styles.containerText}>
-              <Text style={styles.textName}>{order.customer_name}</Text>
-              <Text style={styles.textAddress}>
-                {order.dropoff.formattedAddress}
-              </Text>
+              <Text style={styles.textName}>{order.dropoffBusinessName}</Text>
+              <Text style={styles.textAddress}>{order.dropoffName}</Text>
             </View>
             <TouchableOpacity onPress={() => onCopyCustomer(order)}>
               <View style={styles.containerChats}>

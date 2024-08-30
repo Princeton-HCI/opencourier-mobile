@@ -1,8 +1,8 @@
 // COURIER MODEL
 export enum OrderSetting {
-  auto_accept = 'auto_accept',
-  auto_reject = 'auto_reject',
-  manual = 'manual',
+  auto_accept = 'AUTO_ACCEPT',
+  auto_reject = 'AUTO_REJECT',
+  manual = 'MANUAL',
 }
 
 export enum VehicleType {
@@ -66,11 +66,12 @@ export enum DietaryRestrictions {
 
 // ORDER MODEL
 export enum OrderStatus {
-  created = 'created',
-  dispatched = 'dispatched',
-  picked_up = 'picked_up',
-  dropped_off = 'dropped_off',
-  canceled = 'canceled',
+  created = 'CREATED',
+  accepted = 'ACCEPTED',
+  dispatched = 'DISPATCHED',
+  picked_up = 'PICKED_UP',
+  dropped_off = 'DROPPED_OF',
+  canceled = 'CANCELED',
 }
 
 export enum UserStatus {

@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 //@ts-ignore
 
@@ -13,17 +14,20 @@ const Client = (): UClient => {
     },
   };
 
-  // const addInterseptor = (axiosClient: UClient) => {
-  //   axiosClient.interceptors.request.use(config => {
-  //     return new Promise(async resolve => {
-  //       if (!config.headers.Authorization) {
-  //         // pull token
-  //         // config.headers.Authorization = `Bearer ${token}`;
-  //       }
+  const addInterseptor = (axiosClient: UClient) => {
+    axiosClient.interceptors.request.use(config => {
+      return new Promise(async resolve => {
+        if (!config.headers.Authorization) {
+          const token = await AsyncStorage.getItem('token');
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        }
 
-  //       resolve(config);
-  //     });
-  //   });
+        resolve(config);
+      });
+    });
+  };
 
   // const refreshToken = async (): Promise<string> => {
   //   // pull token
@@ -70,7 +74,7 @@ const Client = (): UClient => {
 
   const Axios = axios.create(options);
 
-  //addInterseptor(Axios);
+  addInterseptor(Axios);
 
   return Axios;
 };

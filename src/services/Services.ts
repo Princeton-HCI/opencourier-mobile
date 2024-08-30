@@ -7,6 +7,7 @@ export type Services = {
   userService: UserService;
   orderService: OrderService;
   commentService: CommentService;
+  logout: () => void;
 };
 
 const Services = (): Services => {
@@ -14,10 +15,15 @@ const Services = (): Services => {
   const oService = orderService(client);
   const cService = commentService(client);
 
+  const logout = () => {
+    client.defaults.headers.common.Authorization = undefined;
+  };
+
   return {
     userService: uService,
     orderService: oService,
     commentService: cService,
+    logout,
   };
 };
 

@@ -3,8 +3,6 @@ import notifee, { EventType, AndroidImportance } from '@notifee/react-native';
 import { Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import messaging from '@react-native-firebase/messaging';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@app/redux/store';
 import navigate from './pushNavigation';
 import { ANDROID_CHANNEL_ID } from '@app/utilities/constants';
 import { PermissionsAndroid } from 'react-native';
@@ -14,7 +12,6 @@ const usePushNotifications = (
   autoRequestPermssions: boolean = false,
 ) => {
   const navigation = useNavigation<any>();
-  const dispatch = useDispatch<AppDispatch>();
 
   const [permissionsGiven, setPermissionsGiven] = useState<boolean>(false);
 
@@ -41,7 +38,6 @@ const usePushNotifications = (
   const getFcmToken = async () => {
     await messaging().registerDeviceForRemoteMessages();
     const token = await messaging().getToken();
-    console.warn(token);
     // dispatch();
     // addDevice({
     //   deviceId: token,

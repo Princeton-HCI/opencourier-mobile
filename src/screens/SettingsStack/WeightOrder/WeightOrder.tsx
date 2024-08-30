@@ -9,50 +9,53 @@ import {
   SettingsCell,
   SettingsCellType,
 } from '@app/components/SettingsCell/SettingsCell';
-import { WeightOrder } from '@app/types/types';
-import { SUPPORTED_WEIGHT_ORDERS } from '@app/utilities/constants';
-import { selectUser, updateUserSettings } from '@app/redux/user/user';
-import { useDispatch, useSelector } from 'react-redux';
 import { OrderPreferences } from '@app/types/enums';
+import useUserSettings from '@app/hooks/useUserSetttings';
 
 type Props = MainScreenProp<MainScreens.WeightOrderScreen>;
 
-const weightInfo = new Map(
-  [['small_orders', 'weight_info_small'], ['medium_orders', 'weight_info_medium'],
-  ['large_orders', 'weight_info_large']]);
+const weightInfo = new Map([
+  ['small_orders', 'weight_info_small'],
+  ['medium_orders', 'weight_info_medium'],
+  ['large_orders', 'weight_info_large'],
+]);
 
 export const WeightOrderScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  const { user, settings } = useSelector(selectUser);
-  const dispatch = useDispatch();
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(
-    settings?.orderPreferences && settings.orderPreferences.length > 0 ? settings.orderPreferences[0]: null
+  const { settings, updateSettings } = useUserSettings();
+
+  // TODO: add to user settings
+
+  const [selectedOrder, setSelectedOrder] = useState<string[]>(
+    settings?.foodPreferences ?? [],
   );
-  const orders = Object.keys(OrderPreferences).filter((item) => {
+  const orders = Object.keys(OrderPreferences).filter(item => {
     return isNaN(Number(item));
   });
 
   const onSelect = (orderPreference: string) => {
-    setSelectedOrder(orderPreference);
-    dispatch(updateUserSettings({ id: user!.id, settings: { orderPreferences: [orderPreference as unknown as OrderPreferences] } }))
+    console.warn('gg');
+    let result = [];
+    if (selectedOrder.indexOf(orderPreference) !== -1) {
+      result = selectedOrder.filter(item => item !== orderPreference);
+    } else {
+      result = [...selectedOrder, orderPreference];
+    }
+
+    setSelectedOrder(result);
+    updateSettings({ foodPreferences: result });
   };
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: string;
-    index: number;
-  }) => {
+  const renderItem = ({ item }: { item: string; index: number }) => {
     return (
       <SettingsCell
         style={{ marginBottom: 16 }}
         title={item}
-        subtitle={weightInfo.get(item) || ""}
+        subtitle={weightInfo.get(item) || ''}
         cellType={SettingsCellType.radioButton}
         radioButtonType={RadioButtonType.checkmark}
         onSelect={onSelect}
-        isSelected={selectedOrder === item}
+        isSelected={selectedOrder.indexOf(item) !== -1}
       />
     );
   };

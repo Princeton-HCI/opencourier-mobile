@@ -24,10 +24,8 @@ type Props = {
 
 export const HistoryCell = ({ style, order, onPress }: Props) => {
   const { t } = useTranslation();
-  const date = moment(order.created_at, formatServer);
+  const date = moment(order.createdAt, formatServer);
   const [colapsed, setColapsed] = useState<boolean>(false);
-
-  
 
   return (
     <TouchableOpacity onPress={() => onPress(order)}>
@@ -37,16 +35,18 @@ export const HistoryCell = ({ style, order, onPress }: Props) => {
           onPress={() => setColapsed(!colapsed)}>
           <View style={styles.containerTImes}>
             <View style={styles.containerTime}>
-              <Text style={styles.textTime}>{formatTime(order.date)}</Text>
+              <Text style={styles.textTime}>{formatTime(order.createdAt)}</Text>
             </View>
             <Text style={{}}>{'-'}</Text>
             <View style={styles.containerTime}>
-              <Text style={styles.textTime}>{formatTime(order.updated_at)}</Text>
+              <Text style={styles.textTime}>{formatTime(order.createdAt)}</Text>
             </View>
           </View>
           <View style={styles.containerCarret}>
             <View style={styles.containerStatus}>
-              <Text style={styles.textStatus}>{currencyFormatter(order.income.totalCharge)}</Text>
+              <Text style={styles.textStatus}>
+                {currencyFormatter(order.pay ?? 0)}
+              </Text>
             </View>
             <Image
               source={Images.CaretDown}
@@ -66,17 +66,21 @@ export const HistoryCell = ({ style, order, onPress }: Props) => {
           </View>
           <View style={[styles.containerInfo]}>
             <Image source={Images.Storefront} style={styles.iconSmall} />
-            <Text style={styles.textInfo}>{order.merchant_name ?? 'N/A'}</Text>
+            <Text style={styles.textInfo}>
+              {order.pickupBusinessName ?? 'N/A'}
+            </Text>
           </View>
           <View style={[styles.containerInfo]}>
             <Image source={Images.HandCoins} style={styles.iconSmall} />
             <Text style={styles.textInfo}>
-              {currencyFormatter(order?.income?.pay)}
+              {currencyFormatter(order?.pay ?? 0)}
             </Text>
           </View>
           <View style={styles.containerInfo}>
             <Image source={Images.HandHeart} style={styles.iconSmall} />
-            <Text style={styles.textInfo}>{currencyFormatter(order.income.tips)}</Text>
+            <Text style={styles.textInfo}>
+              {currencyFormatter(order.pay ?? 0)}
+            </Text>
           </View>
           <Button
             type={ButtonType.grayBGRedText}

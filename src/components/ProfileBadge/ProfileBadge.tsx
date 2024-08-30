@@ -58,7 +58,7 @@ export const ProfileBadge = ({
             styles.containerStatus,
             { backgroundColor: backgroundColor },
           ]}>
-          <Text style={styles.textStatus}>{userStatus}</Text>
+          <Text style={styles.textStatus}>{userStatus.toLowerCase()}</Text>
         </View>
       )}
     </TouchableOpacity>

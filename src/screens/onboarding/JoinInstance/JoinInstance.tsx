@@ -11,10 +11,9 @@ import { Button, ButtonType } from '@app/components/Button/Button';
 import { Images } from '@app/utilities/images';
 import { TextField } from '@app/components/TextField/TextField';
 import { validateEmail } from '@app/utilities/text';
-import { RootScreen } from '@app/navigation/types';
-import { useDispatch } from 'react-redux';
-import { signup } from '@app/redux/user/user';
-import { SignupParams } from '@app/services/types';
+import { useMutation } from '@tanstack/react-query';
+import { services } from '@app/services/service';
+import useUser from '@app/hooks/useUser';
 
 type Props = OnboardingScreenProp<OnboardingScreen.JoinInstance>;
 
@@ -29,18 +28,36 @@ type TextFieldErrors = {
 export const JoinInstance = ({ navigation, route }: Props) => {
   const { instance } = route.params;
   const { t } = useTranslation();
-  const [firstname, setFirstname] = useState<string>('');
-  const [lastname, setLastname] = useState<string>('');
+
+  const [firstName, setFirstname] = useState<string>('');
+  const [lastName, setLastname] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-
   const [errors, setErrors] = useState<TextFieldErrors>({
     firstname: undefined,
     lastname: undefined,
     email: undefined,
     password: undefined,
     confirmPassword: undefined,
+  });
+
+  const { refetchUser } = useUser();
+
+  const { mutate: register, isPending } = useMutation({
+    mutationFn: services.userService.signup,
+    onSuccess: () => {
+      refetchUser();
+    },
+    onError: error => {
+      setErrors({
+        email: error.message ?? 'Wrong email or password',
+        password: undefined,
+        firstname: undefined,
+        lastname: undefined,
+        confirmPassword: undefined,
+      });
+    },
   });
 
   const validateFields = () => {
@@ -84,9 +101,11 @@ export const JoinInstance = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     validateFields();
-  }, [firstname, lastname, email, password, confirmPassword]);
+  }, [firstName, lastName, email, password, confirmPassword]);
 
-  const dispatch = useDispatch();
+  const onSignupHandle = () => {
+    register({ firstName, lastName, password, email });
+  };
 
   return (
     <View style={styles.container}>
@@ -100,7 +119,7 @@ export const JoinInstance = ({ navigation, route }: Props) => {
         <TextField
           key={'name'}
           error={errors.firstname}
-          value={firstname}
+          value={firstName}
           placeholder={t('translations:first_name')}
           onChangeText={setFirstname}
           onBlur={validateFields}
@@ -109,7 +128,7 @@ export const JoinInstance = ({ navigation, route }: Props) => {
         <TextField
           key={'lastname'}
           error={errors.lastname}
-          value={lastname}
+          value={lastName}
           placeholder={t('translations:last_name')}
           onChangeText={setLastname}
           onBlur={validateFields}
@@ -149,12 +168,9 @@ export const JoinInstance = ({ navigation, route }: Props) => {
           icon={Images.PlusCircle}
           type={ButtonType.green}
           title={t('translations:join_instance')}
-          onPress={() => {
-            console.log("Dispatching signup")
-            dispatch(signup({ firstname, lastname, email, password } as SignupParams))
-          }
-          }
+          onPress={onSignupHandle}
           style={{ marginBottom: 22 }}
+          isLoading={isPending}
         />
 
         <View style={styles.separator} />

@@ -59,7 +59,7 @@ export const UserStatusSelector = ({ style, onPress, selected }: Props) => {
       <TouchableOpacity key={status} onPress={() => onPress(status)}>
         <View style={[buttonStyle, { backgroundColor: buttonColor }]}>
           <Text style={[styles.text, { color: textColor }]}>
-            {t(`translations:${status}`)}
+            {t(`translations:${status.toLowerCase()}`)}
           </Text>
         </View>
       </TouchableOpacity>

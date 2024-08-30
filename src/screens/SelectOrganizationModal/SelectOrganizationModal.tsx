@@ -20,7 +20,6 @@ export const SelectOrganizationModal = ({ navigation, route }: Props) => {
     preselected,
   );
 
-  console.warn(selected)
   const handleOrganizationSelect = (org: Organization) => {
     setSelected(org);
     onOrganizationSelect && onOrganizationSelect(org);

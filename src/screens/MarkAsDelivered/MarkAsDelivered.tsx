@@ -1,13 +1,13 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import {
   View,
   Text,
   SafeAreaView,
   TouchableOpacity,
   Image,
-  Alert,
   SectionListData,
   SectionList,
+  Alert,
 } from 'react-native';
 import { styles } from './MarkAsDelivered.styles';
 import { MainScreenProp, MainScreens } from '@app/navigation/main/types';
@@ -17,11 +17,11 @@ import { CustomerNotes, Photo } from '@app/types/types';
 import { Images } from '@app/utilities/images';
 import { Button, ButtonType } from '@app/components/Button/Button';
 import { PhotoCell } from '@app/components/PhotoCell/PhotoCell';
-import { RootState } from '@app/redux/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { markAsDelivered, selectOrder } from '@app/redux/order/order';
+import { services } from '@app/services/service';
 import { useTranslation } from 'react-i18next';
 import { RootScreen } from '@app/navigation/types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { QueryKeys } from '@app/utilities/queryKeys';
 
 type Props = MainScreenProp<MainScreens.MarkAsDelivered>;
 
@@ -31,6 +31,8 @@ type SectionListItem = {
 
 export const MarkAsDelivered = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
   const { order } = route.params;
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | undefined>(
     undefined,
@@ -52,9 +54,17 @@ export const MarkAsDelivered = ({ navigation, route }: Props) => {
     { data: [{ notes: [] }], title: t('translations:add_note') },
   ]);
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
-  const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { markAsDeliveredFinished, markAsDeliveredError } = useSelector(selectOrder);
+
+  const { mutate: markAsDelivered, isPending } = useMutation({
+    mutationFn: services.orderService.markAsDelivered,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.inProgressOrders, QueryKeys.orderHistory],
+      });
+      navigation.goBack();
+    },
+    onError: error => Alert.alert('Error marking as delivered', error.message),
+  });
 
   const handleNotePress = (note: string) => {
     const found = selectedNotes.filter(obj => obj === note);
@@ -92,12 +102,11 @@ export const MarkAsDelivered = ({ navigation, route }: Props) => {
 
   const renderItem = ({
     section,
-
   }: {
     index: number;
-    section: SectionListData<SectionListItem>,
+    section: SectionListData<SectionListItem>;
   }) => {
-    const item = section.data[0]
+    const item = section.data[0];
     return (
       <View style={styles.contentContainerStyle}>
         {item.notes &&
@@ -144,19 +153,11 @@ export const MarkAsDelivered = ({ navigation, route }: Props) => {
   };
 
   const handleConfirm = () => {
-    setIsLoading(true);
-    dispatch(markAsDelivered({ id: order.id, data: { notes: selectedNotes.map(note => t(`translations:${note}`)).concat(data[1].data[0].notes), photo: selectedPhoto } }));
-    return;
+    markAsDelivered({
+      id: order.id,
+      note: selectedNotes.length > 0 ? selectedNotes[0] : '',
+    });
   };
-
-  useEffect(() => {
-    if (markAsDeliveredFinished) {
-      setIsLoading(false);
-      if (!markAsDeliveredError) {
-        navigation.goBack();
-      }
-    }
-  }, [markAsDeliveredError, markAsDeliveredFinished, navigation]);
 
   return (
     <View style={styles.container}>
@@ -210,7 +211,7 @@ export const MarkAsDelivered = ({ navigation, route }: Props) => {
         )}
 
         <Button
-          isLoading={isLoading}
+          isLoading={isPending}
           style={styles.buttonConfirm}
           textStyle={styles.buttonTextStyle}
           icon={Images.CheckWhite}

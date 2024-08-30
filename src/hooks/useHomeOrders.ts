@@ -1,28 +1,12 @@
-import { ConfirmItemsCheck, Order, UserStatus } from '@app/types/types';
-import { RootState } from '@app/redux/store';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  acceptOrder,
-  declineOrder,
-  getInProgressOrders,
-  getNewOrders,
-  getOrderHistory,
-  selectOrder,
-} from '@app/redux/order/order';
+import { Order, UserStatus } from '@app/types/types';
+import { services } from '@app/services/service';
 import { useEffect, useState } from 'react';
 import { AUTO_ACCEPT_DECLINE_TIMER } from '@app/utilities/constants';
-import { getAutoAcceptOrdersStorage } from '@app/utilities/storage';
-import { selectUser } from '@app/redux/user/user';
 import { OrderSetting } from '@app/types/enums';
-import {
-  selectComment,
-} from '@app/redux/comment/comment';
 import { Alert } from 'react-native';
-
-type NewOrderTimer = {
-  secondsRemaining: number;
-  orderId: string;
-};
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { QueryKeys } from '@app/utilities/queryKeys';
+import useUser from './useUser';
 
 class Timer {
   started: Date;
@@ -47,276 +31,144 @@ class Timer {
 }
 
 export const useHomeOrders = () => {
- // const [confirmedItems, setConfirmedItems] = useState<ConfirmItemsCheck[]>([]);
-  const [autoAcceptOrders, setAutoAcceptOrders] = useState<boolean>(false);
-  const [newOrdersTimers, setNewOrdersTimers] = useState<NewOrderTimer[]>([]);
-  const [dataSourceHistory, setDataSourceHistory] = useState<Order[]>([]);
   const [dataSourceNew, setDataSourceNew] = useState<Order[]>([]);
   const [dataSourceInProgress, setDataSourceInProgress] = useState<Order[]>([]);
-
-  //Temp fix
-  const [upDownVotedNoteIds, setUpDownVotedNoteIds] = useState<string[][]>([[],[]]);
-
+  const [dataSourceHistory, setDataSourceHistory] = useState<Order[]>([]);
   const [offerExpirationTimers, setOfferExpirationTimers] = useState<
     Map<string, Timer>
   >(new Map());
-  const { user } = useSelector(selectUser);
-  const dispatch = useDispatch();
-  const {
-    newOrders,
-    getNewOrdersFinished,
-    getNewOrdersError,
-    inProgressOrders,
-    getInProgressOrdersFinished,
-    getInProgressOrdersError,
-    orderHistory,
-    getOrderHistoryFinished,
-    getOrderHistoryError,
-    acceptOrderFinished,
-    acceptOrderError,
-    declineOrderFinished,
-    declineOrderError,
-    confirmItemsFinished,
-    confirmItemsError,
-    // confirmedItemsForOrder,
-  } = useSelector(selectOrder);
+
+  // quieries
 
   const {
-    createCommentFinished,
-    updateCommentFinished,
-    deleteCommentFinished,
-    createCommentError,
-    updateCommentError,
-    deleteCommentError,
-  } = useSelector(selectComment);
+    data: newOrders,
+    isLoading: loadingNewOrders,
+    refetch: refetchNew,
+  } = useQuery({
+    queryFn: services.orderService.getNewOrders,
+    queryKey: [QueryKeys.newOrders],
+  });
 
-  // const itemsConfirmedForOrder = (order: Order) => {
-  //   const temp = confirmedItems.filter(obj => obj.orderId === order.id);
-  //   if (temp.length > 0) {
-  //     return temp[0].confirmedItems;
-  //   } else {
-  //     return false;
-  //   }
-  // };
+  const {
+    data: inProgressOrders,
+    isLoading: loadingInProgressOrders,
+    refetch: refetchInProgress,
+  } = useQuery({
+    queryFn: services.orderService.getInProgressOrders,
+    queryKey: [QueryKeys.inProgressOrders],
+  });
 
-  // useEffect(() => {
-  //   const id = setInterval(() => {
-  //     if (newOrdersTimers.length > 0) {
-  //       var timers = [...newOrdersTimers];
-  //       const timersNew: (NewOrderTimer | undefined)[] = timers.map(obj => {
-  //         if (obj !== undefined) {
-  //           const secsRemaining = obj.secondsRemaining - 1;
-  //           if (secsRemaining > -1) {
-  //             return {
-  //               orderId: obj.orderId,
-  //               secondsRemaining: secsRemaining,
-  //             };
-  //           } else {
-  //             const array = newOrders?.filter(temp => temp.id === obj.orderId);
-  //             if (array && array.length > 0) {
-  //               if (autoAcceptOrders) {
-  //                 dispatch(acceptOrder(array[0]));
-  //               } else {
-  //                 dispatch(declineOrder(array[0]));
-  //               }
-  //             }
-  //             return undefined;
-  //           }
-  //         }
-  //       });
-  //       const newTimers: NewOrderTimer[] = timersNew.filter(
-  //         obj => obj !== undefined,
-  //       );
-  //       setNewOrdersTimers(newTimers);
-  //     }
-  //   }, 1000);
+  const {
+    data: historyOrders,
+    isLoading: loadingHistoryOrders,
+    refetch: refechHistory,
+  } = useQuery({
+    queryFn: services.orderService.getOrdersHistory,
+    queryKey: [QueryKeys.orderHistory],
+  });
 
-  //   return () => {
-  //     clearInterval(id);
-  //   };
-  // });
+  // mutations
+
+  const { mutate: acceptOrder } = useMutation({
+    mutationFn: services.orderService.acceptOrder,
+    onSuccess: () => {
+      refetchNew();
+      refetchInProgress();
+    },
+    onError: error => Alert.alert('Error accepting order', error.message),
+  });
+
+  const { mutate: declineOrder } = useMutation({
+    mutationFn: services.orderService.declineOrder,
+    onSuccess: () => {
+      refetchNew();
+    },
+    onError: error => Alert.alert('Error declining order', error.message),
+  });
+
+  //Temp fix
+  const [upDownVotedNoteIds, setUpDownVotedNoteIds] = useState<string[][]>([
+    [],
+    [],
+  ]);
+
+  const { user } = useUser();
+
   const acceptOrderFn = (orderId: string) => {
-    console.log('Dispatching accept order', orderId);
     offerExpirationTimers.get(orderId)?.stop();
     offerExpirationTimers.delete(orderId);
-    dispatch(acceptOrder({ id: orderId, data: { courierId: user!.id } }));
+
+    acceptOrder(orderId);
+
     const updateNewOrders = newOrders!.filter(
-      newOrder => newOrder.id != orderId,
+      newOrder => newOrder.id !== orderId,
     );
     setDataSourceNew(updateNewOrders);
   };
-  //dispatch(acceptOrder({ id, data: { courierId: user!.id } }));
 
   const declineOrderFn = (orderId: string) => {
-    console.log('Dispatching decline order', orderId);
     offerExpirationTimers.get(orderId)?.stop();
     offerExpirationTimers.delete(orderId);
-    dispatch(declineOrder({ id: orderId, data: { courierId: user!.id } }));
-    const updateNewOrders = newOrders!.filter(
-      newOrder => newOrder.id != orderId,
-    );
+
+    declineOrder(orderId);
+
+    const updateNewOrders = newOrders!.filter(item => item.id !== orderId);
     setDataSourceNew(updateNewOrders);
   };
 
   useEffect(() => {
-    if (getNewOrdersFinished) {
-      if (!getNewOrdersError) {
-        if (newOrders !== undefined) {
-          const newOfferExpirationTimers = new Map(offerExpirationTimers);
-          newOrders.forEach(order =>
-            newOfferExpirationTimers.set(
-              order.id,
-              new Timer(
-                () =>
-                  user!.orderSetting == OrderSetting.auto_accept
-                    ? acceptOrderFn(order.id)
-                    : declineOrderFn(order.id),
-                AUTO_ACCEPT_DECLINE_TIMER,
-              ),
-            ),
-          );
-          setOfferExpirationTimers(newOfferExpirationTimers);
-          setDataSourceNew(newOrders);
-        }
-      }
+    if (newOrders !== undefined) {
+      const newOfferExpirationTimers = new Map(offerExpirationTimers);
+      newOrders.forEach(order =>
+        newOfferExpirationTimers.set(
+          order.id,
+          new Timer(
+            () =>
+              user!.deliverySetting === OrderSetting.auto_accept
+                ? acceptOrderFn(order.id)
+                : declineOrderFn(order.id),
+            AUTO_ACCEPT_DECLINE_TIMER,
+          ),
+        ),
+      );
+      setOfferExpirationTimers(newOfferExpirationTimers);
+      setDataSourceNew(newOrders);
     }
-  }, [newOrders, getNewOrdersError, getNewOrdersFinished]);
+  }, [newOrders]);
 
   useEffect(() => {
-    if (getInProgressOrdersFinished) {
-      if (!getInProgressOrdersError) {
-        if (inProgressOrders !== undefined) {
-          setDataSourceInProgress(inProgressOrders);
-        }
-      }
+    if (inProgressOrders) {
+      setDataSourceInProgress(inProgressOrders);
     }
-  }, [inProgressOrders, getInProgressOrdersFinished]);
+  }, [inProgressOrders]);
 
   useEffect(() => {
-    if (getOrderHistoryFinished) {
-      if (!getOrderHistoryError) {
-        if (orderHistory !== undefined) {
-          setDataSourceHistory(orderHistory);
-        }
-      }
+    if (historyOrders) {
+      setDataSourceHistory(historyOrders);
     }
-  }, [orderHistory, getOrderHistoryError, getOrderHistoryFinished]);
+  }, [historyOrders]);
 
   useEffect(() => {
-    if (declineOrderFinished) {
-      if (!declineOrderError) {
-        fetchNewOrders();
-      }
+    if (user?.status === UserStatus.Online) {
+      refetchNew();
     }
-  }, [declineOrderError, declineOrderFinished]);
-
-  useEffect(() => {
-    if (acceptOrderFinished) {
-      if (!acceptOrderError) {
-        fetchNewOrders();
-        fetchInProgressOrders();
-      }
-    }
-  }, [acceptOrderError, acceptOrderFinished]);
-
-  const fetchNewOrders = () => {
-    dispatch(getNewOrders({ excludedIds: user!.rejectedOrders }));
-  };
-
-  const fetchInProgressOrders = () => {
-    dispatch(getInProgressOrders({ data: { courierId: user!.id } }));
-  };
-
-  const fetchHistory = () => {
-    console.log('dispatching fetch history');
-    dispatch(getOrderHistory({ data: { courierId: user!.id } }));
-  };
-
-  // useEffect(() => {
-  //   if (confirmItemsFinished) {
-  //     if (!confirmItemsError) {
-  //       if (confirmedItemsForOrder !== undefined) {
-  //         var rest = confirmedItems.filter(
-  //           obj => obj.orderId !== confirmedItemsForOrder.id,
-  //         );
-  //         rest.push({
-  //           orderId: confirmedItemsForOrder.id,
-  //           confirmedItems: true,
-  //         });
-  //         // console.warn('HERE!!!: ', confirmedItemsForOrder);
-  //         setConfirmedItems(rest);
-  //       }
-  //     }
-  //   }
-  // }, [confirmItemsError, confirmItemsFinished, confirmedItemsForOrder]);
-
-  useEffect(() => {
-    if (confirmItemsFinished) {
-      if (confirmItemsError) {
-        console.warn("presenting alert")
-        Alert.alert('API Error', confirmItemsError);
-      }
-    }
-  }, [confirmItemsError, confirmItemsFinished]);
-
-  useEffect(() => {
-    if (user?.status == UserStatus.Online)
-      fetchNewOrders();
-    fetchInProgressOrders();
-    fetchHistory();
-    // (async () => {
-    //   const accept = await getAutoAcceptOrdersStorage();
-    //   setAutoAcceptOrders(accept);
-    // })();
-  }, []);
-  useEffect(() => {
-    if (user?.status == UserStatus.Online)
-      fetchNewOrders();
-  }, [user?.status])
-  
-  useEffect(() => {
-    if(createCommentFinished) {
-      if(createCommentError) {
-        // console.warn('comment error', createCommentError)
-        Alert.alert("API Error", createCommentError)
-      } else {
-        fetchInProgressOrders();
-      }
-    } 
-    if(deleteCommentFinished) {
-      // console.warn('delete comment finished with error', deleteCommentError)
-      if(deleteCommentError) {
-        // console.warn('comment error', deleteCommentError)
-        Alert.alert("API Error", deleteCommentError)
-      } else {
-        fetchInProgressOrders();
-      }
-    } 
-    if(updateCommentFinished) {
-      if(updateCommentError) {
-        // console.warn('comment error', updateCommentError)
-        Alert.alert("API Error", updateCommentError)
-      } else {
-        fetchInProgressOrders();
-      }
-    } 
-  }, [createCommentFinished, updateCommentFinished, deleteCommentFinished, createCommentError, deleteCommentError, updateCommentError]);
+  }, [user?.status]);
 
   const upvoteCommentTemp = (noteId: string) => {
     if (!upDownVotedNoteIds[0].includes(noteId)) {
       setUpDownVotedNoteIds([
-        [...upDownVotedNoteIds[0], noteId], 
-        upDownVotedNoteIds[1].filter(e => e != noteId)
-      ])
+        [...upDownVotedNoteIds[0], noteId],
+        upDownVotedNoteIds[1].filter(e => e != noteId),
+      ]);
     }
   };
 
   const downvoteCommentTemp = (noteId: string) => {
     if (!upDownVotedNoteIds[1].includes(noteId)) {
       setUpDownVotedNoteIds([
-        upDownVotedNoteIds[0].filter(e => e != noteId), 
-        [...upDownVotedNoteIds[1], noteId]
-      ])
+        upDownVotedNoteIds[0].filter(e => e != noteId),
+        [...upDownVotedNoteIds[1], noteId],
+      ]);
     }
   };
 
@@ -324,22 +176,18 @@ export const useHomeOrders = () => {
     dataSourceNew,
     dataSourceHistory,
     dataSourceInProgress,
-    newOrdersTimers,
-    getNewOrdersFinished,
-    getInProgressOrdersFinished,
-    getOrderHistoryFinished,
-    fetchNewOrders,
-    fetchInProgressOrders,
-    fetchHistory,
-    //itemsConfirmedForOrder,
     offerExpirationTimers,
     setOfferExpirationTimers,
-    //confirmedItems,
     acceptOrderFn,
     declineOrderFn,
     //Temp fix
     upDownVotedNoteIds,
     upvoteCommentTemp,
     downvoteCommentTemp,
+    isLoading:
+      loadingNewOrders || loadingInProgressOrders || loadingHistoryOrders,
+    refetchNew,
+    refetchInProgress,
+    refechHistory,
   };
 };

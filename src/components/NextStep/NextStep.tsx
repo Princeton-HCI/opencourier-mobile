@@ -14,13 +14,14 @@ import { Order, ToastMessage, User } from '@app/types/types';
 import { Button, ButtonType } from '../Button/Button';
 import { Toast } from '../Toast/Toast';
 import { OrderStatus } from '@app/types/enums';
+import useOrder from '@app/hooks/useOrder';
+import { MainNavigationProp, MainScreens } from '@app/navigation/main/types';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
   order: Order;
   onReportIssue?: (order: Order) => void;
-  onConfirmOrderItems: (order: Order) => void;
-  onMarkAsDelivered: (order: Order) => void;
   onOrderItemsListForCustomer: () => void;
 };
 
@@ -28,13 +29,17 @@ export const NextStep = ({
   style,
   order,
   onReportIssue,
-  onConfirmOrderItems,
-  onMarkAsDelivered,
   onOrderItemsListForCustomer,
 }: Props) => {
   const { t } = useTranslation();
+  const navigation = useNavigation<MainNavigationProp>();
+
+  const { confirmOrderItems } = useOrder();
 
   const userCell = () => {
+    if (!order.orderItems) {
+      return;
+    }
     return (
       <TouchableOpacity
         style={styles.cell}
@@ -44,13 +49,25 @@ export const NextStep = ({
           style={{ width: 20, height: 20 }}
         />
         <View style={styles.cellText}>
-          <Text style={styles.cellName}>{order.customer_name}</Text>
-          <Text style={styles.cellItems}>{`${order.items.length} ` + (order.items.length > 1 ? "items" : "item")}</Text>
+          <Text style={styles.cellName}>{order.dropoffName}</Text>
+          <Text style={styles.cellItems}>
+            {`${order.orderItems.length} ` +
+              (order.orderItems.length > 1 ? 'items' : 'item')}
+          </Text>
         </View>
         <Image source={Images.ArrowRightBlack} />
       </TouchableOpacity>
     );
   };
+
+  const onMarkAsDelivered = () => {
+    navigation.navigate(MainScreens.MarkAsDelivered, { order: order });
+  };
+
+  const isDispatched =
+    order.status === OrderStatus.dispatched ||
+    order.status === OrderStatus.accepted;
+
   return (
     <View style={styles.nextStep}>
       <View style={styles.blueSeparator} />
@@ -58,23 +75,25 @@ export const NextStep = ({
         <Image source={Images.ArrowsForward} />
         <Text style={styles.textNextStep}>Next Step</Text>
       </View>
-      {order.status === OrderStatus.dispatched && (
+      {/* {isDispatched && (
         <Toast
           toast={ToastMessage.get_closer}
           disableClose
           style={{ marginBottom: 10 }}
         />
-      )}
-      {order.status === OrderStatus.dispatched &&
-        userCell()}
-      {order.status === OrderStatus.dispatched && (
+      )} */}
+      {isDispatched && userCell()}
+      {isDispatched && (
         <Button
           style={{ marginHorizontal: 12, marginTop: 10 }}
           type={ButtonType.green}
           icon={Images.Hamburger}
           title={t('translations:confirm_items')}
           onPress={() => {
-            onConfirmOrderItems(order);
+            confirmOrderItems({
+              id: order.id,
+              isDispatched: order.status === OrderStatus.dispatched,
+            });
           }}
         />
       )}
@@ -85,7 +104,7 @@ export const NextStep = ({
             type={ButtonType.green}
             icon={Images.CheckWhite}
             title={t('translations:mark_as_delivered')}
-            onPress={() => onMarkAsDelivered(order)}
+            onPress={onMarkAsDelivered}
           />
           <Button
             style={{ marginHorizontal: 12, marginTop: 10 }}

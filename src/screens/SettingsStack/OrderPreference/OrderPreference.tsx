@@ -8,45 +8,47 @@ import {
   SettingsCell,
   SettingsCellType,
 } from '@app/components/SettingsCell/SettingsCell';
-import { OrderPreference } from '@app/types/types';
-import { SUPPORTED_ORDER_PREFERENCES } from '@app/utilities/constants';
 import { FoodPreferences } from '@app/types/enums';
-import { selectUser, updateUserSettings } from '@app/redux/user/user';
-import { useDispatch, useSelector } from 'react-redux';
+import useUserSettings from '@app/hooks/useUserSetttings';
 
 type Props = MainScreenProp<MainScreens.OrderPreferenceScreen>;
 
 export const OrderPreferenceScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  const user = useSelector(selectUser);
-  const dispatch = useDispatch();
-  const [selectedPreference, setSelectedPreference] = useState<string
-    | null>(
-      user.settings?.foodPreferences && user.settings.foodPreferences.length > 0 ? user.settings.foodPreferences![0] : null,
-    );
-  const preferences = Object.keys(FoodPreferences).filter((item) => {
-    return isNaN(Number(item));
-  });;;
+  const { settings, updateSettings, isUpdating } = useUserSettings();
 
-  const onSelect = (preference: string) => {
-    setSelectedPreference(preference);
-    dispatch(updateUserSettings({ id: user.user!.id, settings: { foodPreferences: [preference as unknown as FoodPreferences] } }))
+  const [selectedPreference, setSelectedPreference] = useState<string[]>(
+    settings?.foodPreferences ?? [],
+  );
+  const preferences = Object.keys(FoodPreferences).filter(item => {
+    return isNaN(Number(item));
+  });
+
+  const onSelect = (restaurantType: string) => {
+    if (isUpdating) {
+      return;
+    }
+    let result = [];
+    if (selectedPreference.indexOf(restaurantType) !== -1) {
+      result = selectedPreference.filter(item => item !== restaurantType);
+    } else {
+      result = [...selectedPreference, restaurantType];
+    }
+
+    setSelectedPreference(result);
+    updateSettings({
+      foodPreferences: result,
+    });
   };
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: string;
-    index: number;
-  }) => {
+  const renderItem = ({ item }: { item: string; index: number }) => {
     return (
       <SettingsCell
         style={{ marginBottom: 16 }}
         title={item}
         cellType={SettingsCellType.radioButton}
         onSelect={onSelect}
-        isSelected={selectedPreference === item}
+        isSelected={selectedPreference.indexOf(item) !== -1}
       />
     );
   };

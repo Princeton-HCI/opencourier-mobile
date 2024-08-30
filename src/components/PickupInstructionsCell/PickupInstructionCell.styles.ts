@@ -66,7 +66,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     flexDirection: 'row',
-    marginRight: 8,
+    marginLeft: 8,
   },
   containerVerticalEdit: {
     width: 32,

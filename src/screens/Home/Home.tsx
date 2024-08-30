@@ -1,13 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Linking,
-  Platform,
-  RefreshControl,
-  View,
-} from 'react-native';
+import { FlatList, Linking, RefreshControl, View } from 'react-native';
 import { styles } from './Home.styles';
 import { HomeHeader } from '@app/components/HomeHeader/HomeHeader';
 import {
@@ -24,41 +16,19 @@ import { HomeEmptyStateComponent } from '@app/components/HomeEmptyState/HomeEmpt
 import { DrawerScreenProp, DrawerScreens } from '@app/navigation/drawer/types';
 import { HistoryCell } from '@app/components/HistoryCell/HistoryCell';
 import { NewOrderCell } from '@app/components/NewOrderCell/NewOrderCell';
-import { getAutoAcceptOrdersStorage } from '@app/utilities/storage';
 import { InProgressCell } from '@app/components/InProgressCell/InProgressCell';
 import ActionSheet from 'react-native-action-sheet';
 import { MainScreens } from '@app/navigation/main/types';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { useDispatch, useSelector } from 'react-redux';
-import order, {
-  acceptOrder,
-  confirmItems,
-  declineOrder,
-} from '@app/redux/order/order';
 import { useHomeOrders } from '@app/hooks/useHomeOrders';
-import { RootState } from '@app/redux/store';
 import { useTranslation } from 'react-i18next';
-import { RootScreen } from '@app/navigation/types';
 import { ReportAnIncident } from '@app/components/ReportAnIncident/ReportAnIncident';
-import {
-  selectUser,
-  setNoteDownvoted,
-  setNoteUpvoted,
-  updateUser,
-} from '@app/redux/user/user';
-import { OrderSetting } from '@app/types/enums';
-import {
-  updateComment,
-  updateCommentFinished,
-  deleteCommentFinished,
-  deleteComment,
-  createComment,
-  upvoteComment,
-  downvoteComment,
-} from '@app/redux/comment/comment';
+import { OrderSetting, OrderStatus } from '@app/types/enums';
 import ButtonSwipe from '@app/components/ButtonSwipe/ButtonSwipe';
 import { SkeletonOrderHistoryCell } from '@app/components/SkeletonOrderHistoryCell/SkeletonOrderHistoryCell';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useUser from '@app/hooks/useUser';
+import { useFocusEffect } from '@react-navigation/native';
 
 type Props = DrawerScreenProp<DrawerScreens.Home>;
 
@@ -68,7 +38,7 @@ export const HomeScreen = ({ navigation }: Props) => {
   const [reportIncidentDismissed, setReportIncidentDismissed] =
     useState<boolean>(false);
   const { t } = useTranslation();
-  const { user, isLoading } = useSelector(selectUser);
+  const { user, isLoading, updateStatus } = useUser();
   const [availableMapApps, setAvailableMapApps] = useState<string[]>([
     t('translations:cancel'),
   ]);
@@ -76,39 +46,32 @@ export const HomeScreen = ({ navigation }: Props) => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('');
   const [dataSource, setDataSource] = useState<Order[]>([]);
-  const [autoAcceptOrders, setAutoAcceptOrders] = useState<boolean>(
-    user!.orderSetting == OrderSetting.auto_accept,
-  );
+  const autoAcceptOrders = user!.deliverySetting === OrderSetting.auto_accept;
+
   const [showMapActionSheet, setShowMapActionSheet] = useState<
     { order: Order; destination: MapDestination } | undefined
   >(undefined);
-  const [refreshing, setRefreshing] = React.useState(false);
   const [orderDeliveredNotif, setOrderDeliveredNotif] =
     useState<boolean>(false);
-  const dispatch = useDispatch();
   const {
+    dataSourceNew,
     dataSourceHistory,
     dataSourceInProgress,
-    dataSourceNew,
-    newOrdersTimers,
     offerExpirationTimers,
-    setOfferExpirationTimers,
-    getNewOrdersFinished,
-    getInProgressOrdersFinished,
-    getOrderHistoryFinished,
-    fetchHistory,
-    fetchInProgressOrders,
-    fetchNewOrders,
-    // itemsConfirmedForOrder,
-    //confirmedItems,
+    refetchNew,
+    refetchInProgress,
+    refechHistory,
     declineOrderFn,
     acceptOrderFn,
     //TEMP upvote/downvote fix
-    upDownVotedNoteIds,
-    upvoteCommentTemp,
-    downvoteCommentTemp,
+    isLoading: isLoadingOrders,
   } = useHomeOrders();
-  
+
+  useFocusEffect(() => {
+    refetchInProgress();
+    refechHistory();
+  });
+
   const onProfilePress = () => {
     navigation.toggleDrawer();
   };
@@ -137,93 +100,12 @@ export const HomeScreen = ({ navigation }: Props) => {
     }
   }, [selectedTab, dataSourceHistory, dataSourceNew, dataSourceInProgress]);
 
-  const onNoteEdited = (editedText: string, note: Comment) => {
-    dispatch(
-      updateComment({
-        id: note.id,
-        data: { text: editedText, commentor: user!.id },
-      }),
-    );
-  };
-  const onNoteDeleted = (note: Comment) => {
-    dispatch(deleteComment({ id: note.id }));
-  };
-  const onNoteAdded = (
-    text: string,
-    type: 'merchant' | 'location',
-    order: Order,
-  ) => {
-    dispatch(
-      createComment({
-        data: {
-          text,
-          commentor: user!.id,
-          [type == 'merchant' ? 'MerchantId' : 'LocationId']:
-            type == 'merchant' ? order.merchant_id : order.dropoff.id,
-        },
-      }),
-    );
-  };
-
-  const onEditNote = (note: Comment) => {
-    navigation.navigate(RootScreen.AddNoteModal, {
-      noteToEdit: note,
-      onNoteEdited: onNoteEdited,
-    });
-  };
-  const onDeleteNote = (note: Comment) => {
-    navigation.navigate(RootScreen.DeleteNoteModal, {
-      onNoteDeleted: onNoteDeleted,
-      note: note,
-    });
-  };
-  const onAddNote = (order: Order, type: 'merchant' | 'location') => {
-    navigation.navigate(RootScreen.AddNoteModal, {
-      onNoteAdded: onNoteAdded,
-      order: order,
-      type: type,
-    });
-  };
-
-  const onPressNote = (note: Comment) => {
-    dispatch(
-      updateComment({
-        id: note.id,
-        data: { likes: note.likes + 1, liker: user!.id },
-      }),
-    );
-  };
-
-  const onNoteUpvote = (note: Comment) => {
-    //Note up/downvote propagation temp fix 
-    upvoteCommentTemp(note.id)
-
-    // dispatch(
-    //   updateComment({
-    //     id: note.id,
-    //     data: { likes: note.likes + 1, liker: user!.id },
-    //   }),
-    // );
-  };
-
-  const onNoteDownvote = (note: Comment) => {
-    //Note up/downvote propagation temp fix 
-    downvoteCommentTemp(note.id)
-
-    // dispatch(
-    //   updateComment({
-    //     id: note.id,
-    //     data: { likes: note.likes - 1, liker: user!.id },
-    //   }),
-    // );
-  };
-
   const onGoOnline = (didSwipe: boolean) => {
     if (!didSwipe) {
       return;
     }
 
-    dispatch(updateUser({ id: user!.id, data: { status: UserStatus.Online } }));
+    updateStatus(UserStatus.Online);
   };
 
   const renderItem = ({ item }: { item: Order }) => {
@@ -238,11 +120,13 @@ export const HomeScreen = ({ navigation }: Props) => {
             order={item}
             onAccept={order => acceptOrderFn(order.id)}
             onDecline={order => declineOrderFn(order.id)}
-            onCopyCustomer={order =>
-              Clipboard.setString(order.dropoff.formattedAddress)
+            onCopyCustomer={
+              order => {}
+              // Clipboard.setString(order.dropoff.formattedAddress)
             }
-            onCopyRestaurant={order =>
-              Clipboard.setString(order.pickup.formattedAddress)
+            onCopyRestaurant={
+              order => {}
+              // Clipboard.setString(order.pickup.formattedAddress)
             }
           />
         );
@@ -253,26 +137,19 @@ export const HomeScreen = ({ navigation }: Props) => {
         // }
         return (
           <InProgressCell
-            upvotedNoteIds={upDownVotedNoteIds[0]}
-            downvotedNoteIds={upDownVotedNoteIds[1]}
-            onMessageCustomer={order =>
-              Clipboard.setString(order.dropoff.formattedAddress)
+            onMessageCustomer={
+              order => {}
+              // Clipboard.setString(order.dropoff.formattedAddress)
             }
-            onMessageRestaurant={order =>
-              Clipboard.setString(order.pickup.formattedAddress)
+            onMessageRestaurant={
+              order => {}
+              // Clipboard.setString(order.pickup.formattedAddress)
             }
-            onConfirmItems={() => {
-              dispatch(confirmItems({ id: item.id }));
-              // setOrderState(OrderState.orderDeliveryInProgress);
-            }}
             onCallCustomer={() =>
-              Linking.openURL(`tel://${item.customerPhoneNumber}`)
+              Linking.openURL(`tel://${item.dropoffPhoneNumber}`)
             }
             onCallRestaurant={() =>
-              Linking.openURL(`tel://${item.merchant_phone_number}`)
-            }
-            onMarkAsDelivered={order =>
-              navigation.navigate(MainScreens.MarkAsDelivered, { order: order })
+              Linking.openURL(`tel://${item.pickupPhoneNumber}`)
             }
             order={item}
             onRestaurantAddressPress={order =>
@@ -287,16 +164,10 @@ export const HomeScreen = ({ navigation }: Props) => {
                 destination: MapDestination.customer,
               })
             }
-            onAddNote={onAddNote}
-            onNotePress={onPressNote}
-            onUpvote={onNoteUpvote}
-            onDownvote={onNoteDownvote}
-            onNoteDelete={onDeleteNote}
-            onNoteEdit={onEditNote}
             onOrderItemsListForCustomer={() => {
               navigation.navigate(MainScreens.ItemsCollected, {
-                customerName: item.customer_name,
-                items: item.items,
+                customerName: item.dropoffName,
+                items: item.orderItems,
               });
             }}
             onReportIssue={order =>
@@ -310,6 +181,7 @@ export const HomeScreen = ({ navigation }: Props) => {
   };
 
   const onSelect = (buttonIndex: number) => {
+    return;
     const { order, destination } = showMapActionSheet ?? {
       order: undefined,
       destination: undefined,
@@ -390,13 +262,13 @@ export const HomeScreen = ({ navigation }: Props) => {
   const onRefresh = () => {
     switch (selectedTab) {
       case HomeTabItem.New:
-        user?.status == UserStatus.Online && fetchNewOrders();
+        user?.status == UserStatus.Online && refetchNew();
         break;
       case HomeTabItem.InProgress:
-        fetchInProgressOrders();
+        refetchInProgress();
         break;
       case HomeTabItem.History:
-        fetchHistory();
+        refechHistory();
         break;
     }
   };
@@ -441,18 +313,6 @@ export const HomeScreen = ({ navigation }: Props) => {
     })();
   }, []);
 
-  const showLoader = useMemo(() => {
-    return (
-      !getNewOrdersFinished ||
-      !getInProgressOrdersFinished ||
-      !getOrderHistoryFinished
-    );
-  }, [
-    getNewOrdersFinished,
-    getInProgressOrdersFinished,
-    getOrderHistoryFinished,
-  ]);
-
   const ListEmptyComponent = useCallback(() => {
     if (isLoading) {
       return <HistorySkeleton />;
@@ -465,7 +325,7 @@ export const HomeScreen = ({ navigation }: Props) => {
     if (
       selectedTab === HomeTabItem.History &&
       dataSource.length === 0 &&
-      !getOrderHistoryFinished
+      !isLoadingOrders
     ) {
       return (
         <>
@@ -477,7 +337,7 @@ export const HomeScreen = ({ navigation }: Props) => {
     } else {
       return null;
     }
-  }, [dataSource.length, getOrderHistoryFinished, selectedTab]);
+  }, [dataSource.length, isLoadingOrders, selectedTab]);
 
   return (
     <View style={styles.container}>
@@ -496,9 +356,7 @@ export const HomeScreen = ({ navigation }: Props) => {
         searchShown={isSearching}
         searchText={searchText}
         onSearchTextChange={setSearchText}
-        loadingNewOrders={
-          selectedTab === HomeTabItem.New && !getNewOrdersFinished
-        }
+        loadingNewOrders={selectedTab === HomeTabItem.New && isLoadingOrders}
       />
       {selectedTab === HomeTabItem.History && !reportIncidentDismissed && (
         <ReportAnIncident onDismiss={() => setReportIncidentDismissed(true)} />
@@ -510,7 +368,7 @@ export const HomeScreen = ({ navigation }: Props) => {
         renderItem={renderItem}
         ListEmptyComponent={ListEmptyComponent}
         refreshControl={
-          <RefreshControl refreshing={showLoader} onRefresh={onRefresh} />
+          <RefreshControl refreshing={isLoadingOrders} onRefresh={onRefresh} />
         }
       />
 

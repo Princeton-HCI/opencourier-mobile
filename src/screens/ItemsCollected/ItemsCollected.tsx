@@ -6,12 +6,10 @@ import { BackNavButton } from '@app/components/BackNavButton/BackNavButton';
 import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@app/styles/colors';
-import { Item, ToastMessage } from '@app/types/types';
+import { OrderItem, ToastMessage } from '@app/types/types';
 import { OrderItemCell } from '@app/components/OrderItemCell/OrderItemCell';
 import { useTranslation } from 'react-i18next';
 import { Toast } from '@app/components/Toast/Toast';
-import { useSelector } from 'react-redux';
-import { selectOrder } from '@app/redux/order/order';
 
 type Props = MainScreenProp<MainScreens.ItemsCollected>;
 
@@ -19,9 +17,9 @@ export const ItemsCollected = ({ navigation, route }: Props) => {
   const { t } = useTranslation();
   const { top } = useSafeAreaInsets();
   const customerName: string = route.params.customerName;
-  const items: Item[] = route.params.items;
+  const items: OrderItem[] = route.params.items;
 
-  const renderItem = ({ item }: { item: Item }) => {
+  const renderItem = ({ item }: { item: OrderItem }) => {
     return <OrderItemCell item={item} onPress={() => undefined} />;
   };
 

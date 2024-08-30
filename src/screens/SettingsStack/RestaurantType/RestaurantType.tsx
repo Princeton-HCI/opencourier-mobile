@@ -9,41 +9,46 @@ import {
   SettingsCellType,
 } from '@app/components/SettingsCell/SettingsCell';
 import { RestaurantTypes } from '@app/types/enums';
-import { selectUser, updateUserSettings } from '@app/redux/user/user';
-import { useDispatch, useSelector } from 'react-redux';
+import useUserSettings from '@app/hooks/useUserSetttings';
 
 type Props = MainScreenProp<MainScreens.RestaurantTypeScreen>;
 
 export const RestaurantTypeScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  const user = useSelector(selectUser);
-  const dispatch = useDispatch();
-  const [selectedRestaurant, setSelectedRestaurant] = useState<string | null>(
-    user.settings?.restaurantTypes && user.settings.restaurantTypes.length > 0? user.settings.restaurantTypes[0]: null,
+  const { settings, updateSettings, isUpdating } = useUserSettings();
+
+  const [selectedRestaurant, setSelectedRestaurant] = useState<string[]>(
+    settings?.restaurantTypes ?? [],
   );
-  const restaurants = Object.keys(RestaurantTypes).filter((item) => {
+  const restaurants = Object.keys(RestaurantTypes).filter(item => {
     return isNaN(Number(item));
   });
 
   const onSelect = (restaurantType: string) => {
-    setSelectedRestaurant(restaurantType);
-    dispatch(updateUserSettings({ id: user.user!.id, settings: { restaurantTypes: [restaurantType as unknown as RestaurantTypes] } }))
+    if (isUpdating) {
+      return;
+    }
+    let result = [];
+    if (selectedRestaurant.indexOf(restaurantType) !== -1) {
+      result = selectedRestaurant.filter(item => item !== restaurantType);
+    } else {
+      result = [...selectedRestaurant, restaurantType];
+    }
+
+    setSelectedRestaurant(result);
+    updateSettings({
+      restaurantTypes: result,
+    });
   };
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: string;
-    index: number;
-  }) => {
+  const renderItem = ({ item }: { item: string; index: number }) => {
     return (
       <SettingsCell
         style={{ marginBottom: 16 }}
         title={item}
         cellType={SettingsCellType.radioButton}
         onSelect={onSelect}
-        isSelected={selectedRestaurant === item}
+        isSelected={selectedRestaurant.indexOf(item) !== -1}
       />
     );
   };

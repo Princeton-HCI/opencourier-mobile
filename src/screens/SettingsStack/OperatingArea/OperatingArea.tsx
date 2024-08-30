@@ -16,19 +16,18 @@ import {
   SettingsCellType,
 } from '@app/components/SettingsCell/SettingsCell';
 import { Images } from '@app/utilities/images';
-import { useSelector } from 'react-redux';
-import { selectUser } from '@app/redux/user/user';
+import useUserSettings from '@app/hooks/useUserSetttings';
 
 type Props = MainScreenProp<MainScreens.OperatingArea>;
 
 export const OperatingArea = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  const user = useSelector(selectUser);
-  const [areas, setAreas] = useState<string[]>(
-    user.settings!.preferredAreas || []
-  );
 
-  const renderItem = ({ item, index }: { item: string; index: number }) => {
+  const { settings } = useUserSettings();
+
+  const [areas, setAreas] = useState<string[]>(settings?.preferredAreas ?? []);
+
+  const renderItem = ({ item }: { item: string; index: number }) => {
     return (
       <SettingsCell
         style={{ marginBottom: 16 }}

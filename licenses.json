@@ -53,6 +53,12 @@
         "licenseUrl": "https://github.com/reduxjs/redux-toolkit/raw/master/LICENSE",
         "parents": "opendeli"
     },
+    "@tanstack/react-query@5.52.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/TanStack/query",
+        "licenseUrl": "https://github.com/TanStack/query/raw/master/LICENSE",
+        "parents": "opendeli"
+    },
     "@thevsstech/react-native-skeleton@2.0.11": {
         "licenses": "ISC",
         "repository": "https://github.com/thevsstech/react-native-skeleton",

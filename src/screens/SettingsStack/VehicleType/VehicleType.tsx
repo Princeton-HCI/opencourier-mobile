@@ -8,31 +8,33 @@ import {
   SettingsCell,
   SettingsCellType,
 } from '@app/components/SettingsCell/SettingsCell';
-import { Vehicle } from '@app/types/types';
-import { SUPPORTED_VEHICLES } from '@app/utilities/constants';
-import { selectUser, updateUserSettings } from '@app/redux/user/user';
-import { useDispatch, useSelector } from 'react-redux';
 import { VehicleType } from '@app/types/enums';
+import useUserSettings from '@app/hooks/useUserSetttings';
 
 type Props = MainScreenProp<MainScreens.VehicleTypeScreen>;
 
 export const VehicleTypeScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch()
-  const user = useSelector(selectUser);
+  const { settings, updateSettings, isUpdating } = useUserSettings();
+
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(
-    user.settings!.vehicleType ? user.settings!.vehicleType : null, 
+    settings?.vehicleType?.toLowerCase() ?? null,
   );
-  const vehicles = Object.keys(VehicleType).filter((item) => {
+  const vehicles = Object.keys(VehicleType).filter(item => {
     return isNaN(Number(item));
   });
 
   const onSelect = (vehicle: string) => {
+    if (isUpdating) {
+      return;
+    }
     setSelectedVehicle(vehicle);
-    dispatch(updateUserSettings({ id: user.user!.id, settings: { vehicleType: vehicle as unknown as VehicleType } }))
+    updateSettings({
+      vehicleType: vehicle.toUpperCase(),
+    });
   };
 
-  const renderItem = ({ item, index }: { item: string; index: number }) => {
+  const renderItem = ({ item }: { item: string; index: number }) => {
     return (
       <SettingsCell
         style={{ marginBottom: 16 }}

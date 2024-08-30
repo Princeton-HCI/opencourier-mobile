@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import {
   OnboardingScreen,
@@ -12,13 +12,10 @@ import { Images } from '@app/utilities/images';
 import { TextField } from '@app/components/TextField/TextField';
 import { validateEmail } from '@app/utilities/text';
 import { Colors } from '@app/styles/colors';
-import { DrawerScreens } from '@app/navigation/drawer/types';
-import { RootScreen } from '@app/navigation/types';
 import { generateBoxShadowStyle } from '@app/utilities/styles';
-import { login } from '@app/redux/user/user';
-import { useDispatch, useSelector } from 'react-redux';
-import { LoginParams } from '@app/services/types';
-import { RootState } from '@app/redux/store';
+import { services } from '@app/services/service';
+import { useMutation } from '@tanstack/react-query';
+import useUser from '@app/hooks/useUser';
 
 type Props = OnboardingScreenProp<OnboardingScreen.LoginInstance>;
 
@@ -35,20 +32,32 @@ enum ScreenState {
 export const LoginInstance = ({ navigation, route }: Props) => {
   const { instance } = route.params;
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const { login: loginRedux, isLoading } = useSelector(
-    (state: RootState) => state.user,
-  );
+
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [screenState, setScreenState] = useState<ScreenState>(
     ScreenState.login,
   );
-
   const [errors, setErrors] = useState<TextFieldErrors>({
     email: undefined,
     password: undefined,
   });
+
+  const {
+    data,
+    mutate: loginUser,
+    isPending,
+  } = useMutation({
+    mutationFn: services.userService.login,
+    onError: error => {
+      setErrors({
+        email: error.message ?? 'Wrong email or password',
+        password: undefined,
+      });
+    },
+  });
+
+  const { user } = useUser(data !== undefined);
 
   const validateFields = () => {
     let emailError;
@@ -72,14 +81,9 @@ export const LoginInstance = ({ navigation, route }: Props) => {
     validateFields();
   }, [email, password]);
 
-  useEffect(() => {
-    if (loginRedux?.loginError) {
-      setErrors({
-        email: loginRedux?.loginError ?? 'Wrong email or password',
-        password: undefined,
-      });
-    }
-  }, [loginRedux]);
+  const onLoginHandle = () => {
+    loginUser({ email, password });
+  };
 
   return (
     <View style={styles.container}>
@@ -113,15 +117,9 @@ export const LoginInstance = ({ navigation, route }: Props) => {
               icon={Images.Logout}
               type={ButtonType.green}
               title={t('translations:log_in')}
-              onPress={() => {
-                if (isLoading) {
-                  return;
-                }
-                console.log('Dispatching login');
-                dispatch(login({ email, password } as LoginParams));
-              }}
+              onPress={onLoginHandle}
               style={{ marginBottom: 22 }}
-              isLoading={isLoading}
+              isLoading={isPending}
             />
           </>
         )}

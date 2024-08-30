@@ -3,8 +3,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { OnboardingScreen, OnboardingStackParamList } from './types';
 import { LandingScreen } from '@app/screens/onboarding/Landing/Landing';
 import { WelcomeScreen } from '@app/screens/onboarding/Welcome/Welcome';
-import { LoginScreen } from '@app/screens/onboarding/Login/Login';
-import { SignupScreen } from '@app/screens/onboarding/Signup/Signup';
 import { ForgotPasswordScreen } from '@app/screens/onboarding/ForgotPassword/ForgotPassword';
 import { InstanceDetails } from '@app/screens/onboarding/InstanceDetails/InstanceDetails';
 import { JoinInstance } from '@app/screens/onboarding/JoinInstance/JoinInstance';
@@ -26,16 +24,6 @@ export const OnboardingStack = () => {
       <OnboardingStackNavigator.Screen
         name={OnboardingScreen.Welcome}
         component={WelcomeScreen}
-        options={DEFAULT_OPTIONS}
-      />
-      <OnboardingStackNavigator.Screen
-        name={OnboardingScreen.Login}
-        component={LoginScreen}
-        options={DEFAULT_OPTIONS}
-      />
-      <OnboardingStackNavigator.Screen
-        name={OnboardingScreen.Signup}
-        component={SignupScreen}
         options={DEFAULT_OPTIONS}
       />
       <OnboardingStackNavigator.Screen
