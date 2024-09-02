@@ -33,6 +33,7 @@ export const WelcomeScreen = ({ navigation }: Props) => {
     console.log('Setting base url:', instance.link);
     client.defaults.baseURL = instance.link;
     await AsyncStorage.setItem('BASE_URL', instance.link);
+    await AsyncStorage.setItem('SOCKET_BASE_URL', instance.ws_link);
     navigation.navigate(OnboardingScreen.InstanceDetails, {
       instance: instance,
     });

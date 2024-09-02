@@ -34,7 +34,6 @@ export const WeightOrderScreen = ({ navigation }: Props) => {
   });
 
   const onSelect = (orderPreference: string) => {
-    console.warn('gg');
     let result = [];
     if (selectedOrder.indexOf(orderPreference) !== -1) {
       result = selectedOrder.filter(item => item !== orderPreference);

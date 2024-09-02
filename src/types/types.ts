@@ -111,6 +111,10 @@ export type Courier = {
   deliverySetting: string;
   userId: string;
   createdAt: string;
+  currentLocation: {
+    latitude: number;
+    longitude: number;
+  };
 };
 
 export type UserResponse = {
@@ -160,175 +164,6 @@ export type Comment = {
   commentor: string;
 };
 
-export type OldOrder = {
-  date: string;
-  id: string;
-  //order_id?: string;
-  courier_id: string;
-  customer_id?: string;
-  customer_name: string;
-  customerPhoneNumber?: string;
-  merchant_id: string;
-  merchant_name: string;
-  merchant_phone_number: string;
-  created_at: string;
-  updated_at: string;
-  // currency: 'USD';
-  merchant_notes_for_courier: string[];
-  customer_notes_for_courier: string[];
-  courier_notes_for_customer: string[];
-  community_notes_for_dropoff_location: Comment[];
-  community_notes_for_merchant: Comment[];
-  // courier_tips_for_merchant: CourierTip[];
-  pickup: Location;
-  dropoff: Location;
-  return?: Location;
-  undeliverable_action: string;
-  undeliverable_reason: string;
-  income: Income;
-  status: OrderStatus;
-  // deliveredTo: User;
-  // restaurant: Restaurant;
-  // price: number;
-  deliveryTypes?: DeliveryType[];
-  pickupTypes?: PickupType[];
-  // restaurantNotes?: string[];
-  // clientNotes?: string[];
-  items: Item[];
-};
-
-/*
-  "id":"cm0dsvrrx001bqpo09efatw2h",
-   "pickupName":"Store Name",
-   "pickupPhoneNumber":"+15555555555",
-   "pickupBusinessName":"Store Name",
-   "pickupNotes":"Follow big green 'Pickup' signs in the parking lot",
-   "pickupVerification":{
-      "signature":true,
-      "signatureRequirement":{
-         "enabled":true,
-         "collectSignerName":true,
-         "collectSignerRelationship":true
-      },
-      "barcodes":[
-         {
-            "value":"string",
-            "type":"CODE39"
-         }
-      ],
-      "identification":{
-         "minAge":21,
-         "noSobrietyCheck":true
-      },
-      "picture":true
-   },
-   "pickupLocationId":"cm0dsrfci0000qpo0bx6vchmc",
-   "pickupReadyAt":"2024-12-12T14:00:00.000Z",
-   "pickupDeadlineAt":"2024-12-12T14:30:00.000Z",
-   "dropoffName":"Gordon Shumway",
-   "dropoffPhoneNumber":"+15555555555",
-   "dropoffBusinessName":"House of Luciano",
-   "dropoffNotes":"Second floor, black door to the right.",
-   "dropoffSellerNotes":"Fragile content - please handle the box with care during delivery.",
-   "dropoffVerification":{
-      "signature":true,
-      "signatureRequirement":{
-         "enabled":true,
-         "collectSignerName":true,
-         "collectSignerRelationship":true
-      },
-      "barcodes":[
-         {
-            "value":"string",
-            "type":"CODE39"
-         }
-      ],
-      "pincode":{
-         "enabled":true,
-         "type":"merchant_provided",
-         "value":"string"
-      },
-      "identification":{
-         "minAge":21,
-         "noSobrietyCheck":true
-      },
-      "picture":true
-   },
-   "dropoffReadyAt":"2024-12-12T14:30:00.000Z",
-   "dropoffEta":"2024-12-12T14:03:32.400Z",
-   "dropoffDeadlineAt":"2024-12-12T16:00:00.000Z",
-   "deliverableAction":"MEET_AT_DOOR",
-   "undeliverableAction":"LEAVE_AT_DOOR",
-   "undeliverableReason":null,
-   "dropoffLocationId":"cm0dsrfcm0001qpo0qn54wno1",
-   "deliveryTypes":[
-      
-   ],
-   "requiresDropoffSignature":true,
-   "requiresId":false,
-   "orderReference":"REF0000002",
-   "orderTotalValue":1000,
-   "orderItems":[
-      {
-         "name":"Bow tie",
-         "quantity":1,
-         "size":"small",
-         "dimensions":{
-            "length":20,
-            "height":20,
-            "depth":20
-         },
-         "price":100,
-         "weight":300,
-         "vatPercentage":1250000
-      }
-   ],
-   "status":"ACCEPTED",
-   "customerNotes":[
-      
-   ],
-   "currencyCode":"USD",
-   "totalCost":3.213,
-   "fee":0.292,
-   "pay":null,
-   "tips":500,
-   "totalCompensation":2.921,
-   "pickupTypes":[
-      
-   ],
-   "imageType":null,
-   "imageName":null,
-   "imageData":null,
-   "idempotencyKey":"12322422",
-   "externalStoreId":"my_store_123",
-   "returnVerification":{
-      "signature":true,
-      "signatureRequirement":{
-         "enabled":true,
-         "collectSignerName":true,
-         "collectSignerRelationship":true
-      },
-      "barcodes":[
-         {
-            "value":"string",
-            "type":"CODE39"
-         }
-      ],
-      "picture":true,
-      "pincode":{
-         "enabled":true,
-         "type":"merchant_provided",
-         "value":"string"
-      }
-   },
-   "externalUserInfo":null,
-   "externalId":"1234567890",
-   "courierId":"cm029az8p0005qplfb2h9zp0h",
-   "partnerId":"cm040ibwv001vqpyqblmpmn12",
-   "deliveryQuoteId":"cm0dsvoj00019qpo0wf5cbg5h",
-   "createdAt":"2024-08-28T11:56:21.981Z"
-*/
-
 export type Verification = {
   signature: boolean;
   signatureRequirement: {
@@ -355,6 +190,9 @@ export type Note = {
   locationId: string;
   deliveryId: string;
   createdAt: string;
+  upvotes: number;
+  downvotes: number;
+  currentCourierReaction: string;
 };
 
 export type OrderItem = {
@@ -423,6 +261,8 @@ export type Order = {
   createdAt: string;
   pickupLocationNotes: Note[];
   dropOffLocationNotes: Note[];
+  pickupLocation: Location;
+  dropoffLocation: Location;
 };
 
 export type PickupruInstruction = {
@@ -501,6 +341,7 @@ export type Instance = {
   name: string;
   imageUrl: string;
   link: string;
+  ws_link: string;
   userCount: number;
   description: string;
   rules: string;

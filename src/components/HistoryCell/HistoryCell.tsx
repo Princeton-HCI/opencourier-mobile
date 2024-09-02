@@ -35,17 +35,21 @@ export const HistoryCell = ({ style, order, onPress }: Props) => {
           onPress={() => setColapsed(!colapsed)}>
           <View style={styles.containerTImes}>
             <View style={styles.containerTime}>
-              <Text style={styles.textTime}>{formatTime(order.createdAt)}</Text>
+              <Text style={styles.textTime}>
+                {formatTime(order.pickupReadyAt)}
+              </Text>
             </View>
             <Text style={{}}>{'-'}</Text>
             <View style={styles.containerTime}>
-              <Text style={styles.textTime}>{formatTime(order.createdAt)}</Text>
+              <Text style={styles.textTime}>
+                {formatTime(order.dropoffReadyAt)}
+              </Text>
             </View>
           </View>
           <View style={styles.containerCarret}>
             <View style={styles.containerStatus}>
               <Text style={styles.textStatus}>
-                {currencyFormatter(order.pay ?? 0)}
+                {currencyFormatter(order.totalCompensation ?? 0)}
               </Text>
             </View>
             <Image
@@ -73,13 +77,13 @@ export const HistoryCell = ({ style, order, onPress }: Props) => {
           <View style={[styles.containerInfo]}>
             <Image source={Images.HandCoins} style={styles.iconSmall} />
             <Text style={styles.textInfo}>
-              {currencyFormatter(order?.pay ?? 0)}
+              {currencyFormatter(order?.fee ?? 0)}
             </Text>
           </View>
           <View style={styles.containerInfo}>
             <Image source={Images.HandHeart} style={styles.iconSmall} />
             <Text style={styles.textInfo}>
-              {currencyFormatter(order.pay ?? 0)}
+              {currencyFormatter(order.tips ?? 0)}
             </Text>
           </View>
           <Button

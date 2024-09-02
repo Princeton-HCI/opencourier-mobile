@@ -43,8 +43,6 @@ export const LicencesScreen = ({ navigation }: Props) => {
     Linking.canOpenURL(license.licenseSpecs.repository).then(supported => {
       if (supported) {
         Linking.openURL(license.licenseSpecs.repository);
-      } else {
-        console.warn('Not Installed');
       }
     });
   };
@@ -88,10 +86,6 @@ export const LicencesScreen = ({ navigation }: Props) => {
     }
     setFinalLicence(temp);
   }, []);
-
-  useEffect(() => {
-    console.warn(finalLicense);
-  }, [finalLicense]);
 
   return (
     <View style={styles.container}>

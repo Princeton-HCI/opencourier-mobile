@@ -30,11 +30,17 @@ export const InProgressMap = ({
       <View style={styles.containerAway}>
         <View style={styles.containerTextAway}>
           <Image source={Images.Distance} />
-          <Text style={styles.textDistance} numberOfLines={2}>{`${metersToMiles(distance)} mi ${t('translations:away')}`}</Text>
+          <Text style={styles.textDistance} numberOfLines={2}>{`${metersToMiles(
+            distance,
+          )} mi ${t('translations:away')}`}</Text>
         </View>
         <View style={styles.containerTextAway}>
           <Image source={Images.Clock} />
-          <Text style={styles.textDistance} numberOfLines={2}>{`${secondsToMinutes(duration)} min ${t('translations:away')}`}</Text>
+          <Text
+            style={styles.textDistance}
+            numberOfLines={2}>{`${secondsToMinutes(duration)} min ${t(
+            'translations:away',
+          )}`}</Text>
         </View>
       </View>
     </View>

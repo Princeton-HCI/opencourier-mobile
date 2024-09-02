@@ -120,13 +120,11 @@ export const HomeScreen = ({ navigation }: Props) => {
             order={item}
             onAccept={order => acceptOrderFn(order.id)}
             onDecline={order => declineOrderFn(order.id)}
-            onCopyCustomer={
-              order => {}
-              // Clipboard.setString(order.dropoff.formattedAddress)
+            onCopyCustomer={order =>
+              Clipboard.setString(order.dropoffLocation.formattedAddress)
             }
-            onCopyRestaurant={
-              order => {}
-              // Clipboard.setString(order.pickup.formattedAddress)
+            onCopyRestaurant={order =>
+              Clipboard.setString(order.pickupLocation.formattedAddress)
             }
           />
         );
@@ -137,13 +135,11 @@ export const HomeScreen = ({ navigation }: Props) => {
         // }
         return (
           <InProgressCell
-            onMessageCustomer={
-              order => {}
-              // Clipboard.setString(order.dropoff.formattedAddress)
+            onMessageCustomer={order =>
+              Clipboard.setString(order.dropoffLocation.formattedAddress)
             }
-            onMessageRestaurant={
-              order => {}
-              // Clipboard.setString(order.pickup.formattedAddress)
+            onMessageRestaurant={order =>
+              Clipboard.setString(order.pickupLocation.formattedAddress)
             }
             onCallCustomer={() =>
               Linking.openURL(`tel://${item.dropoffPhoneNumber}`)
@@ -181,28 +177,27 @@ export const HomeScreen = ({ navigation }: Props) => {
   };
 
   const onSelect = (buttonIndex: number) => {
-    return;
     const { order, destination } = showMapActionSheet ?? {
       order: undefined,
       destination: undefined,
     };
     if (
       order !== undefined &&
-      order.pickup !== undefined &&
-      order.dropoff !== undefined &&
+      order.pickupLocation !== undefined &&
+      order.dropoffLocation !== undefined &&
       destination !== undefined
     ) {
       const labelCustomer =
-        order.customer_name ?? t('translations:dropoff_address');
+        order.dropoffName ?? t('translations:dropoff_address');
       const labelRestauran =
-        order.merchant_name ?? t('translations:pickup_address');
+        order.pickupName ?? t('translations:pickup_address');
       const label =
         destination === MapDestination.customer
           ? labelCustomer
           : labelRestauran;
 
-      const latLngCustomer = `${order.dropoff.latitude}, ${order.dropoff.longitude}.`;
-      const latLngRestaurant = `${order.pickup.latitude}, ${order.pickup.longitude}.`;
+      const latLngCustomer = `${order.dropoffLocation.latitude}, ${order.dropoffLocation.longitude}.`;
+      const latLngRestaurant = `${order.pickupLocation.latitude}, ${order.pickupLocation.longitude}.`;
       const latLng = MapDestination.customer
         ? latLngCustomer
         : latLngRestaurant;

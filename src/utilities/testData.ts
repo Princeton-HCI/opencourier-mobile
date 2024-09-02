@@ -89,6 +89,7 @@ export const TEST_INSTANCES: Instance[] = [
   {
     name: 'New Api',
     link: 'http://ec2-3-94-231-35.compute-1.amazonaws.com:3000/api/courier/v1/',
+    ws_link: 'ws://ec2-3-94-231-35.compute-1.amazonaws.com:3000/couriers',
     imageUrl: TEST_IMAGE_URL,
     userCount: 3,
     rules: TEST_RULES,
@@ -113,6 +114,7 @@ export const TEST_INSTANCES: Instance[] = [
   {
     name: 'NYC Courier Collective',
     link: 'http://localhost:3001/',
+    ws_link: 'ws://localhost:3001/couriers',
     imageUrl: TEST_IMAGE_URL,
     userCount: 3,
     rules: TEST_RULES,

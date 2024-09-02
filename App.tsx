@@ -3,6 +3,7 @@ import { Router } from '@app/navigation/router';
 import { NavigationContainer } from '@react-navigation/native';
 import UserContext from '@app/context/userContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import SocketProvider from '@app/services/socket';
 
 if (__DEV__) {
   require('./ReactotronConfig');
@@ -26,6 +27,7 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <NavigationContainer>
           <Router />
+          <SocketProvider />
         </NavigationContainer>
       </QueryClientProvider>
     </UserContext.Provider>

@@ -37,10 +37,14 @@ export const PickupInstructionCell = ({ style, note }: Props) => {
   const editDisabled = isNoteString ? true : note.courierId !== user?.id;
 
   // TODO: calculate those
-  const upvoted = false;
-  const downvoted = false;
+  const upvoted = !isNoteString
+    ? note.currentCourierReaction === 'UPVOTE'
+    : false;
+  const downvoted = !isNoteString
+    ? note.currentCourierReaction === 'DOWNVOTE'
+    : false;
   const endorsed = false;
-  const likes = 0;
+  const likes = !isNoteString ? note.upvotes - note.downvotes : 0;
 
   const onUpvote = () => {
     if (isNoteString) {
@@ -135,7 +139,7 @@ export const PickupInstructionCell = ({ style, note }: Props) => {
                 upvoted && { color: Colors.green8 },
                 downvoted && { color: Colors.red7 },
               ]}>
-              {upvoted ? likes + 1 : downvoted ? likes - 1 : likes}
+              {likes}
             </Text>
             <TouchableOpacity
               style={styles.containerVoteButton}

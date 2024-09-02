@@ -128,7 +128,7 @@ export const SideMenu = ({ navigation }: Props) => {
   }, [locationPermission]);
 
   const onLogoutHandle = async () => {
-    await AsyncStorage.multiRemove(['token', 'BASE_URL']);
+    await AsyncStorage.multiRemove(['token', 'BASE_URL', 'SOCKET_BASE_URL']);
     services.logout();
     queryClient.resetQueries();
   };

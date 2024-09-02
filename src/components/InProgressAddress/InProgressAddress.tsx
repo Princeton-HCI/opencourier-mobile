@@ -32,9 +32,9 @@ export const InProgressAdress = ({
 }: Props) => {
   const address = useMemo(() => {
     if (customerOrRestaurant === 'customer') {
-      return `${order.dropoffName ?? 'N/A'}`;
+      return `${order.dropoffLocation.formattedAddress ?? 'N/A'}`;
     } else {
-      return `${order.pickupName ?? 'N/A'}`;
+      return `${order.pickupLocation.formattedAddress ?? 'N/A'}`;
     }
   }, [customerOrRestaurant]);
 

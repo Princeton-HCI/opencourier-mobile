@@ -46,28 +46,32 @@ export const InProgressCell = ({
   const [duration, setDuration] = useState<number>(0); // seconds
 
   useEffect(() => {
-    if (user!.location && order.pickup && order.dropoff) {
+    if (
+      user!.currentLocation &&
+      order.pickupLocation &&
+      order.dropoffLocation
+    ) {
       const coordinates = [
-        [user!.location.coordinates[0], user!.location.coordinates[1]],
-        [order.pickup.longitude, order.pickup.latitude],
-        [order.dropoff.longitude, order.dropoff.latitude],
+        [user!.currentLocation.longitude, user!.currentLocation.latitude],
+        [order.pickupLocation.longitude, order.pickupLocation.latitude],
+        [order.dropoffLocation.longitude, order.dropoffLocation.latitude],
       ];
       getDistance(coordinates).then(({ duration, distance }) => {
         setDuration(duration);
         setDistance(distance);
       });
     }
-  }, []);
+  }, [user!.currentLocation, order]);
 
   return (
     <View style={[styles.container, style]}>
       <View style={{ paddingHorizontal: 12, paddingTop: 12 }}>
         <InProgressCellHeader
-          title={order.pickupBusinessName ?? 'N/A'}
+          title={order.dropoffName ?? 'N/A'}
           icon={Images.Storefront}
           expanded={topExpanded}
           onExpandedPress={() => setTopExpanded(!topExpanded)}
-          finished={order.status == OrderStatus.picked_up}
+          finished={order.status === OrderStatus.picked_up}
         />
         <View style={styles.containerContentRestaurant}>
           <View style={styles.containerLeft}>

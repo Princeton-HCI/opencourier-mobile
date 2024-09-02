@@ -71,19 +71,22 @@ export const NewOrderCell = ({
   };
 
   useEffect(() => {
-    return;
-    if (user!.location && order.pickup && order.dropoff) {
+    if (
+      user!.currentLocation &&
+      order.pickupLocation &&
+      order.dropoffLocation
+    ) {
       const coordinates = [
-        [user!.location.coordinates[0], user!.location.coordinates[1]],
-        [order.pickup.longitude, order.pickup.latitude],
-        [order.dropoff.longitude, order.dropoff.latitude],
+        [user!.currentLocation.longitude, user!.currentLocation.latitude],
+        [order.pickupLocation.longitude, order.pickupLocation.latitude],
+        [order.dropoffLocation.longitude, order.dropoffLocation.latitude],
       ];
       getDistance(coordinates).then(({ duration, distance }) => {
         setDuration(duration);
         setDistance(distance);
       });
     }
-  }, []);
+  }, [user, order]);
 
   return (
     <View style={[styles.container, style]}>
@@ -98,8 +101,10 @@ export const NewOrderCell = ({
         <View style={styles.containerRight}>
           <View style={styles.containerAddressButton}>
             <View style={styles.containerText}>
-              <Text style={styles.textName}>{order.pickupBusinessName}</Text>
-              <Text style={styles.textAddress}>{order.pickupName}</Text>
+              <Text style={styles.textName}>{order.pickupName}</Text>
+              <Text style={styles.textAddress}>
+                {order.pickupLocation.formattedAddress}
+              </Text>
             </View>
             <TouchableOpacity onPress={() => onCopyRestaurant(order)}>
               <View style={styles.containerChats}>
@@ -127,8 +132,10 @@ export const NewOrderCell = ({
           </View>
           <View style={styles.containerAddressButton}>
             <View style={styles.containerText}>
-              <Text style={styles.textName}>{order.dropoffBusinessName}</Text>
-              <Text style={styles.textAddress}>{order.dropoffName}</Text>
+              <Text style={styles.textName}>{order.dropoffName}</Text>
+              <Text style={styles.textAddress}>
+                {order.dropoffLocation.formattedAddress}
+              </Text>
             </View>
             <TouchableOpacity onPress={() => onCopyCustomer(order)}>
               <View style={styles.containerChats}>
