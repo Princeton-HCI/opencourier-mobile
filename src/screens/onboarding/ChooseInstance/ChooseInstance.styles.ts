@@ -2,16 +2,25 @@ import { Colors } from '@app/styles/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    // backgroundColor: Colors.white,
+    paddingHorizontal: 32,
   },
   safeArea: {
     flex: 1,
     justifyContent: 'center',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 22,
+    paddingTop: 16,
+  },
   content: {
-    paddingHorizontal: 32,
+    paddingHorizontal: 12,
     paddingBottom: 32,
   },
   imageOpenDeli: {
