@@ -175,7 +175,7 @@ export default {
   later_stay_offline: 'Later & Stay Offline',
   stay_online: 'Stay Online',
   continue_orders: 'Continue Orders',
-  add_organization: 'Add organization',
+  add_instance: 'Add instance',
   enter_url_or_search: 'Enter URL or search for an organization',
   deli_is_made: 'Explore & Deliver with Open Deli',
   quickly_find_restaurant:
