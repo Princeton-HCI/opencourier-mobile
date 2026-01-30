@@ -128,7 +128,10 @@ export const WelcomeScreen = ({ navigation }: Props) => {
             />
             <Button
               style={[styles.buttonContinue, { marginBottom: 22 }]}
-              disabled={registryLink.trim().length === 0}
+              disabled={
+                registryLink.trim().length === 0 &&
+                instanceLink.trim().length === 0
+              }
               iconPosition="right"
               type={ButtonType.grayBGBlackText}
               icon={Images.ArrowRightThin}

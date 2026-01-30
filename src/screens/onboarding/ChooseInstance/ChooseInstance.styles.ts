@@ -46,6 +46,9 @@ export const styles = StyleSheet.create({
     marginBottom: 22,
     color: Colors.black,
   },
+  linkText: {
+    textDecorationLine: 'underline',
+  },
   buttonSignup: {
     marginTop: 80,
   },

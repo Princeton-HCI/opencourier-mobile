@@ -122,7 +122,8 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
             contentContainerStyle={styles.content}>
             <Image source={Images.OpenDeli} style={styles.imageOpenDeli} />
             <Text style={styles.textSubtitle}>
-              {t('translations:registry_link') + ' ' + registryLink}
+              {t('translations:registry_link') + ': '}
+              <Text style={styles.linkText}>{registryLink}</Text>
             </Text>
             <Text style={styles.textSubtitle}>
               {t('translations:choose_instance')}
