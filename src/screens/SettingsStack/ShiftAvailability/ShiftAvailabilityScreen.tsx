@@ -18,12 +18,11 @@ import {
   ShiftAvailability,
 } from '@app/types/types';
 import { ShiftCell } from '@app/components/ShiftCell/ShiftCell';
-
-import { TEST_ORG_ARRAY } from '@app/utilities/testData';
 import { Images } from '@app/utilities/images';
 import { RootScreen } from '@app/navigation/types';
 import DatePicker from 'react-native-date-picker';
 import useUserSettings from '@app/hooks/useUserSetttings';
+import useInstance from '@app/hooks/useInstance';
 
 type Props = MainScreenProp<MainScreens.ShiftAvailabilityScreen>;
 function capitalizeFirstLetter(string: string) {
@@ -64,10 +63,10 @@ function getSelectedDays(
 
 export const ShiftAvailabilityScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  // TODO: Configure this to reference the node
-  // QQQ: Should not allow to switch between nodes
-  const [selectedOrg, setSelectedOrg] = useState<Organization>(
-    TEST_ORG_ARRAY[0],
+  // Fetch user instances to get the current organization
+  const { userInstances, isLoadingInstances } = useInstance();
+  const [selectedOrg, setSelectedOrg] = useState<Organization | undefined>(
+    userInstances[0],
   );
   const [showModal, setShowModal] = useState<boolean>(false);
   const [dayToAddShiftTo, setDayToAddShiftTo] = useState<{
@@ -86,7 +85,9 @@ export const ShiftAvailabilityScreen = ({ navigation }: Props) => {
   );
 
   const { settings, updateSettings, isUpdating } = useUserSettings();
-  const availability = settings?.shiftAvailability ?? {};
+  const availability = settings?.shiftAvailability as
+    | ShiftAvailability
+    | undefined;
 
   const [selectedDays, setSelectedDays] = useState<string[]>(
     getSelectedDays(availability ?? []),
@@ -374,6 +375,13 @@ export const ShiftAvailabilityScreen = ({ navigation }: Props) => {
     }
   }, [shiftToAdd]);
 
+  // Update selectedOrg when instances are loaded
+  useEffect(() => {
+    if (!isLoadingInstances && userInstances.length > 0 && !selectedOrg) {
+      setSelectedOrg(userInstances[0]);
+    }
+  }, [userInstances, isLoadingInstances]);
+
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safe}>
@@ -383,21 +391,24 @@ export const ShiftAvailabilityScreen = ({ navigation }: Props) => {
             {t('translations:shift_availability')}
           </Text>
         </View>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate(RootScreen.SelectOrganizationModal, {
-              preselected: selectedOrg,
-              onOrganizationSelect: org => setSelectedOrg(org),
-            })
-          }
-          style={styles.org}>
-          <Image
-            source={{ uri: selectedOrg.imageUrl }}
-            style={styles.iconOrg}
-          />
-          <Text style={styles.textOrg}>{selectedOrg.name}</Text>
-          <Image source={Images.Dropdown} />
-        </TouchableOpacity>
+        {selectedOrg && (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate(RootScreen.SelectOrganizationModal, {
+                preselected: selectedOrg,
+                onOrganizationSelect: (org: Organization) =>
+                  setSelectedOrg(org),
+              })
+            }
+            style={styles.org}>
+            <Image
+              source={{ uri: selectedOrg.imageUrl }}
+              style={styles.iconOrg}
+            />
+            <Text style={styles.textOrg}>{selectedOrg.name}</Text>
+            <Image source={Images.Dropdown} />
+          </TouchableOpacity>
+        )}
         <FlatList
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}

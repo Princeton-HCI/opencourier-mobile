@@ -7,6 +7,13 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.transparentModalBackground,
     justifyContent: 'flex-end',
   },
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   contentButton: {
     backgroundColor: Colors.gray1,
   },
@@ -19,6 +26,11 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: Colors.gray5,
+  },
+  textCount: {
+    fontSize: 14,
+    color: Colors.gray5,
+    textAlign: 'center',
   },
   buttonAdd: {
     flexDirection: 'row',
@@ -41,5 +53,15 @@ export const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: Colors.gray1,
     alignSelf: 'center',
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

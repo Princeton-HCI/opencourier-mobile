@@ -21,8 +21,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  iconSearch: {
-    width: 32,
-    height: 32,
+  dropdown: {
+    marginLeft: 4,
   },
 });
