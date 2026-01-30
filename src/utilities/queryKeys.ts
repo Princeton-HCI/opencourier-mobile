@@ -4,4 +4,6 @@ export const QueryKeys = {
   newOrders: 'newOrders',
   inProgressOrders: 'inProgressOrders',
   orderHistory: 'orderHistory',
+  instance: 'instance',
+  userInstances: 'userInstances',
 };
