@@ -13,12 +13,13 @@ import { InstanceTabItem } from '@app/types/types';
 import { Button, ButtonType } from '@app/components/Button/Button';
 import { BackNavButton } from '@app/components/BackNavButton/BackNavButton';
 import { client } from '@app/services/Client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Instance } from '@app/types/types';
 
 type Props = OnboardingScreenProp<OnboardingScreen.InstanceDetails>;
 
 export const InstanceDetails = ({ navigation, route }: Props) => {
-  const { instanceLink, registryLink } = route.params;
+  const { instanceLink, registryLink, mode } = route.params;
   const { t } = useTranslation();
   const [tab, setTab] = useState<InstanceTabItem>(InstanceTabItem.Description);
   const [instance, setInstance] = useState<Instance | null>(null);
@@ -73,11 +74,28 @@ export const InstanceDetails = ({ navigation, route }: Props) => {
     }
   }, [instanceLink]);
 
+  useEffect(() => {
+    const setClientDefaults = async () => {
+      if (!instance?.details?.link) return;
+      const sanitizedLink = instance.details.link.trim().replace(/\/$/, '');
+      client.defaults.baseURL = sanitizedLink + '/api/courier/v1';
+      await AsyncStorage.setItem('BASE_URL', sanitizedLink + '/api/courier/v1');
+      if (instance.details.websocketLink) {
+        await AsyncStorage.setItem(
+          'SOCKET_BASE_URL',
+          instance.details.websocketLink,
+        );
+      }
+    };
+
+    setClientDefaults();
+  }, [instance]);
+
   const handleBack = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(OnboardingScreen.Welcome);
+      navigation.navigate(OnboardingScreen.Welcome, { mode: mode });
     }
   };
 
@@ -138,6 +156,7 @@ export const InstanceDetails = ({ navigation, route }: Props) => {
                 if (instance) {
                   navigation.navigate(OnboardingScreen.JoinInstance, {
                     instance: instance,
+                    mode: mode,
                   });
                 }
               }}
@@ -152,6 +171,7 @@ export const InstanceDetails = ({ navigation, route }: Props) => {
                 if (instance) {
                   navigation.navigate(OnboardingScreen.LoginInstance, {
                     instance: instance,
+                    mode: mode,
                   });
                 }
               }}

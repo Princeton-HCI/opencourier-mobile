@@ -15,9 +15,12 @@ export enum OnboardingScreen {
 
 export type OnboardingStackParamList = {
   Landing: undefined;
-  Welcome: undefined;
+  Welcome: {
+    mode?: 'onboarding' | 'add-instance';
+  };
   ChooseInstance: {
     registryLink: string;
+    mode?: 'onboarding' | 'add-instance';
   };
   Login: undefined;
   Signup: undefined;
@@ -25,12 +28,15 @@ export type OnboardingStackParamList = {
   InstanceDetails: {
     instanceLink: string;
     registryLink?: string;
+    mode?: 'onboarding' | 'add-instance';
   };
   JoinInstance: {
     instance: Instance;
+    mode?: 'onboarding' | 'add-instance';
   };
   LoginInstance: {
     instance: Instance;
+    mode?: 'onboarding' | 'add-instance';
   };
 };
 

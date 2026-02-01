@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Alert } from 'react-native';
 import { RootScreen, RootScreenProp } from '@app/navigation/types';
+import { OnboardingScreen } from '@app/navigation/onboarding/types';
 import { styles } from './SideMenu.styles';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import { ProfileBadge } from '@app/components/ProfileBadge/ProfileBadge';
@@ -27,6 +28,8 @@ import useUser from '@app/hooks/useUser';
 import { useQueryClient } from '@tanstack/react-query';
 import { services } from '@app/services/service';
 import useInstance from '@app/hooks/useInstance';
+import { client } from '@app/services/Client';
+import { CommonActions } from '@react-navigation/native';
 
 type Props = RootScreenProp<RootScreen.Loading>;
 
@@ -148,9 +151,36 @@ export const SideMenu = ({ navigation }: Props) => {
   }, [locationPermission]);
 
   const onLogoutHandle = async () => {
-    await AsyncStorage.multiRemove(['token', 'BASE_URL', 'SOCKET_BASE_URL']);
+    // Clear client configuration FIRST
+    client.defaults.baseURL = undefined;
+    client.defaults.headers.common.Authorization = undefined;
+
+    // Logout from services (clears axios headers)
     services.logout();
-    queryClient.resetQueries();
+
+    // Clear ALL cached queries before navigating away
+    queryClient.clear();
+
+    // Clear all auth-related async storage
+    await AsyncStorage.multiRemove(['token', 'BASE_URL', 'SOCKET_BASE_URL']);
+
+    // Reset the root navigator to Onboarding with Landing screen
+    const parentNav = navigation.getParent();
+    if (parentNav) {
+      parentNav.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            {
+              name: RootScreen.Onboarding,
+              params: {
+                screen: OnboardingScreen.Landing,
+              },
+            },
+          ],
+        }),
+      );
+    }
   };
 
   const handlePress = (item: SideMenuItem) => {

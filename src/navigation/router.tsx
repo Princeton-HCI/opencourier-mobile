@@ -75,6 +75,11 @@ export const Router = () => {
             options={DEFAULT_OPTIONS}
           />
           <RootStack.Screen
+            name={RootScreen.Onboarding}
+            component={OnboardingStack}
+            options={DEFAULT_OPTIONS}
+          />
+          <RootStack.Screen
             name={RootScreen.SelectOrganizationModal}
             component={SelectOrganizationModal}
             options={{ headerShown: false, presentation: 'transparentModal' }}

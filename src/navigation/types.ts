@@ -21,7 +21,10 @@ export enum RootScreen {
 
 export type RootStackParamList = {
   Loading: undefined;
-  Onboarding: undefined;
+  Onboarding: {
+    screen?: string;
+    params?: any;
+  };
   Main: undefined;
   SelectOrganizationModal: {
     preselected: Organization;

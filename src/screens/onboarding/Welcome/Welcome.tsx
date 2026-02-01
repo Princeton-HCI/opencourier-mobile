@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { TextField } from '@app/components/TextField/TextField';
 import { Button, ButtonType } from '@app/components/Button/Button';
 import { Colors } from '@app/styles/colors';
+import { BackNavButton } from '@app/components/BackNavButton/BackNavButton';
 
 type Props = OnboardingScreenProp<OnboardingScreen.Welcome>;
 
@@ -26,8 +27,9 @@ type TextFieldErrors = {
   instanceLink: string | undefined;
 };
 
-export const WelcomeScreen = ({ navigation }: Props) => {
+export const WelcomeScreen = ({ navigation, route }: Props) => {
   const { t, i18n } = useTranslation();
+  const mode = route.params?.mode || 'onboarding';
   const [registryLink, setRegistryLink] = useState<string>('');
   const [instanceLink, setInstanceLink] = useState<string>('');
   const [errors, setErrors] = useState<TextFieldErrors>({
@@ -52,6 +54,15 @@ export const WelcomeScreen = ({ navigation }: Props) => {
     i18n.changeLanguage('en');
   }, [i18n]);
 
+  useEffect(() => {
+    // Only clear fields when first entering add-instance mode, not on every focus
+    if (mode === 'add-instance') {
+      setRegistryLink('');
+      setInstanceLink('');
+      setErrors({ registryLink: undefined, instanceLink: undefined });
+    }
+  }, [mode]);
+
   const nextStep = (registryLink: string, instanceLink: string) => {
     const sanitizedRegistryLink = registryLink.trim().replace(/\/$/, '');
     const sanitizedInstanceLink = instanceLink.trim().replace(/\/$/, '');
@@ -59,11 +70,26 @@ export const WelcomeScreen = ({ navigation }: Props) => {
     if (sanitizedInstanceLink.length > 0) {
       navigation.navigate(OnboardingScreen.InstanceDetails, {
         instanceLink: sanitizedInstanceLink,
+        mode: mode,
       });
     } else {
       navigation.navigate(OnboardingScreen.ChooseInstance, {
         registryLink: sanitizedRegistryLink,
+        mode: mode,
       });
+    }
+  };
+
+  const handleBack = () => {
+    if (mode === 'add-instance') {
+      const parentNav = navigation.getParent();
+      if (parentNav?.canGoBack()) {
+        parentNav.goBack();
+        return;
+      }
+    }
+    if (navigation.canGoBack()) {
+      navigation.goBack();
     }
   };
 
@@ -71,6 +97,11 @@ export const WelcomeScreen = ({ navigation }: Props) => {
     <View style={styles.container}>
       <Image source={Images.NoiseBG} style={styles.background} />
       <SafeAreaView style={styles.safeArea}>
+        {mode === 'add-instance' && (
+          <View style={styles.header}>
+            <BackNavButton onPress={handleBack} />
+          </View>
+        )}
         <KeyboardAvoidingView
           style={styles.container}
           enabled
@@ -83,7 +114,9 @@ export const WelcomeScreen = ({ navigation }: Props) => {
               style={styles.textTitle}
               adjustsFontSizeToFit={true}
               numberOfLines={1}>
-              {t('translations:welcome')}
+              {mode === 'add-instance'
+                ? t('translations:add_instance')
+                : t('translations:welcome')}
             </Text>
             <Text style={styles.textSubtitle}>
               {t('translations:input_registry_link')}

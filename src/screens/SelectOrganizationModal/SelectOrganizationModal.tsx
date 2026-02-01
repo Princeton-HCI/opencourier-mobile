@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Organization } from '@app/types/types';
 import { OrganizationCell } from '@app/components/OrganizationCell/OrganizationCell';
 import { RootScreen, RootScreenProp } from '@app/navigation/types';
+import { OnboardingScreen } from '@app/navigation/onboarding/types';
 import { useTranslation } from 'react-i18next';
 import useInstance from '@app/hooks/useInstance';
 
@@ -76,7 +77,14 @@ export const SelectOrganizationModal = ({ navigation, route }: Props) => {
         )}
         {/* want to navigate to the welcome screens here*/}
         <View style={[styles.contentButton, { paddingBottom: bottom }]}>
-          <TouchableOpacity style={styles.buttonAdd} onPress={() => {}}>
+          <TouchableOpacity
+            style={styles.buttonAdd}
+            onPress={() => {
+              navigation.push(RootScreen.Onboarding, {
+                screen: OnboardingScreen.Welcome,
+                params: { mode: 'add-instance' },
+              });
+            }}>
             <Image source={Images.Plus} style={styles.plus} />
             <Text style={styles.textAdd}>{t('translations:add_instance')}</Text>
           </TouchableOpacity>

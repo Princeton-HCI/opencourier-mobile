@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   OnboardingScreen,
   OnboardingScreenProp,
@@ -11,9 +19,10 @@ import { Button, ButtonType } from '@app/components/Button/Button';
 import { Images } from '@app/utilities/images';
 import { TextField } from '@app/components/TextField/TextField';
 import { validateEmail } from '@app/utilities/text';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { services } from '@app/services/service';
 import useUser from '@app/hooks/useUser';
+import { QueryKeys } from '@app/utilities/queryKeys';
 
 type Props = OnboardingScreenProp<OnboardingScreen.JoinInstance>;
 
@@ -26,8 +35,9 @@ type TextFieldErrors = {
 };
 
 export const JoinInstance = ({ navigation, route }: Props) => {
-  const { instance } = route.params;
+  const { instance, mode } = route.params;
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   const [firstName, setFirstname] = useState<string>('');
   const [lastName, setLastname] = useState<string>('');
@@ -41,6 +51,7 @@ export const JoinInstance = ({ navigation, route }: Props) => {
     password: undefined,
     confirmPassword: undefined,
   });
+  const [alreadyLoggedIn, setAlreadyLoggedIn] = useState<boolean>(false);
 
   const { refetchUser } = useUser();
 
@@ -48,6 +59,10 @@ export const JoinInstance = ({ navigation, route }: Props) => {
     mutationFn: services.userService.signup,
     onSuccess: () => {
       refetchUser();
+      // If in "add instance" mode, invalidate instances query to refresh the list
+      if (mode === 'add-instance') {
+        queryClient.invalidateQueries({ queryKey: [QueryKeys.userInstances] });
+      }
     },
     onError: error => {
       setErrors({
@@ -103,7 +118,34 @@ export const JoinInstance = ({ navigation, route }: Props) => {
     validateFields();
   }, [firstName, lastName, email, password, confirmPassword]);
 
+  useEffect(() => {
+    // Check if already logged into this specific instance
+    const checkIfAlreadyLoggedIn = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const baseUrl = await AsyncStorage.getItem('BASE_URL');
+      // Only consider logged in if both token AND matching baseURL exist
+      if (token && baseUrl) {
+        const sanitizedCurrentInstance = baseUrl.replace('/api/courier/v1', '');
+        const sanitizedTargetInstance = instance.details.link
+          .trim()
+          .replace(/\/$/, '');
+        if (sanitizedCurrentInstance === sanitizedTargetInstance) {
+          setAlreadyLoggedIn(true);
+        }
+      }
+    };
+    checkIfAlreadyLoggedIn();
+  }, [instance.details.link]);
+
   const onSignupHandle = () => {
+    if (alreadyLoggedIn) {
+      Alert.alert(
+        'Already Logged In',
+        'You are already logged into this instance. Please use the organization switcher in the menu to access it.',
+        [{ text: 'OK' }],
+      );
+      return;
+    }
     register({ firstName, lastName, password, email });
   };
 
@@ -180,6 +222,7 @@ export const JoinInstance = ({ navigation, route }: Props) => {
           onPress={() =>
             navigation.navigate(OnboardingScreen.LoginInstance, {
               instance: instance,
+              mode: mode,
             })
           }>
           <Text style={styles.textButton}>
@@ -193,7 +236,9 @@ export const JoinInstance = ({ navigation, route }: Props) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.containerBottom}
-          onPress={() => navigation.navigate(OnboardingScreen.Welcome)}>
+          onPress={() =>
+            navigation.navigate(OnboardingScreen.Welcome, { mode: mode })
+          }>
           <Text style={styles.textButton}>
             {t('translations:looking_for_instances')}
             <Text> </Text>

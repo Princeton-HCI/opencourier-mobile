@@ -85,7 +85,7 @@ export const LandingScreen = ({ navigation }: Props) => {
       setPage(page + 1);
       ref.current?.setPage(page + 1);
     } else {
-      navigation.navigate(OnboardingScreen.Welcome);
+      navigation.navigate(OnboardingScreen.Welcome, { mode: 'onboarding' });
     }
   };
 

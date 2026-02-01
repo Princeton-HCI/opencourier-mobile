@@ -10,6 +10,13 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 22,
+    paddingTop: 16,
+    paddingHorizontal: 32,
+  },
   content: {
     paddingHorizontal: 32,
     paddingBottom: 32,

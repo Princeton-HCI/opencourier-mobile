@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   OnboardingScreen,
   OnboardingScreenProp,
@@ -14,8 +22,10 @@ import { validateEmail } from '@app/utilities/text';
 import { Colors } from '@app/styles/colors';
 import { generateBoxShadowStyle } from '@app/utilities/styles';
 import { services } from '@app/services/service';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useUser from '@app/hooks/useUser';
+import { QueryKeys } from '@app/utilities/queryKeys';
+import { RootScreen } from '@app/navigation/types';
 
 type Props = OnboardingScreenProp<OnboardingScreen.LoginInstance>;
 
@@ -30,9 +40,8 @@ enum ScreenState {
 }
 
 export const LoginInstance = ({ navigation, route }: Props) => {
-  const { instance } = route.params;
+  const { instance, mode } = route.params;
   const { t } = useTranslation();
-
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [screenState, setScreenState] = useState<ScreenState>(
@@ -42,6 +51,11 @@ export const LoginInstance = ({ navigation, route }: Props) => {
     email: undefined,
     password: undefined,
   });
+  const [alreadyLoggedIn, setAlreadyLoggedIn] = useState<boolean>(false);
+
+  const queryClient = useQueryClient();
+
+  const { refetchUser } = useUser(false);
 
   const {
     data,
@@ -49,6 +63,15 @@ export const LoginInstance = ({ navigation, route }: Props) => {
     isPending,
   } = useMutation({
     mutationFn: services.userService.login,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [QueryKeys.user] });
+      await refetchUser();
+      // Navigate to root Main screen after successful login
+      const parentNav = navigation.getParent();
+      if (parentNav) {
+        parentNav.navigate(RootScreen.Main as any);
+      }
+    },
     onError: error => {
       setErrors({
         email: error.message ?? 'Wrong email or password',
@@ -56,8 +79,6 @@ export const LoginInstance = ({ navigation, route }: Props) => {
       });
     },
   });
-
-  const { user } = useUser(data !== undefined);
 
   const validateFields = () => {
     let emailError;
@@ -81,7 +102,34 @@ export const LoginInstance = ({ navigation, route }: Props) => {
     validateFields();
   }, [email, password]);
 
+  useEffect(() => {
+    // Check if already logged into this specific instance
+    const checkIfAlreadyLoggedIn = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const baseUrl = await AsyncStorage.getItem('BASE_URL');
+      // Only consider logged in if both token AND matching baseURL exist
+      if (token && baseUrl) {
+        const sanitizedCurrentInstance = baseUrl.replace('/api/courier/v1', '');
+        const sanitizedTargetInstance = instance.details.link
+          .trim()
+          .replace(/\/$/, '');
+        if (sanitizedCurrentInstance === sanitizedTargetInstance) {
+          setAlreadyLoggedIn(true);
+        }
+      }
+    };
+    checkIfAlreadyLoggedIn();
+  }, [instance.details.link]);
+
   const onLoginHandle = () => {
+    if (alreadyLoggedIn) {
+      Alert.alert(
+        'Already Logged In',
+        'You are already logged into this instance. Please use the organization switcher in the menu to access it.',
+        [{ text: 'OK' }],
+      );
+      return;
+    }
     loginUser({ email, password });
   };
 
@@ -141,6 +189,7 @@ export const LoginInstance = ({ navigation, route }: Props) => {
               onPress={() =>
                 navigation.navigate(OnboardingScreen.JoinInstance, {
                   instance: instance,
+                  mode: mode,
                 })
               }
               style={{ marginBottom: 22 }}
@@ -200,6 +249,7 @@ export const LoginInstance = ({ navigation, route }: Props) => {
               onPress={() =>
                 navigation.navigate(OnboardingScreen.JoinInstance, {
                   instance: instance,
+                  mode: mode,
                 })
               }>
               <Text style={styles.textButton}>
@@ -216,7 +266,9 @@ export const LoginInstance = ({ navigation, route }: Props) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.containerBottom}
-              onPress={() => navigation.navigate(OnboardingScreen.Welcome)}>
+              onPress={() =>
+                navigation.navigate(OnboardingScreen.Welcome, { mode: mode })
+              }>
               <Text style={styles.textButton}>
                 {t('translations:looking_for_instances')}
                 <Text> </Text>
@@ -236,6 +288,7 @@ export const LoginInstance = ({ navigation, route }: Props) => {
               onPress={() =>
                 navigation.navigate(OnboardingScreen.JoinInstance, {
                   instance: instance,
+                  mode: mode,
                 })
               }>
               <Text style={styles.textButton}>
@@ -252,7 +305,9 @@ export const LoginInstance = ({ navigation, route }: Props) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.containerBottom}
-              onPress={() => navigation.navigate(OnboardingScreen.Welcome)}>
+              onPress={() =>
+                navigation.navigate(OnboardingScreen.Welcome, { mode: mode })
+              }>
               <Text style={styles.textButton}>
                 {t('translations:looking_for_instances')}
                 <Text> </Text>

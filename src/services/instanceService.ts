@@ -60,14 +60,17 @@ const instanceService = (client: UClient): InstanceService => {
    */
   const getUserInstances = async (): Promise<Organization[]> => {
     try {
-      // Ensure the client has the correct baseURL before making requests
-      await ensureBaseUrl();
+      // Get the baseURL without modifying it if it's not set
+      let baseUrl = client.defaults.baseURL;
+
+      // If not set in client, try to load from storage
+      if (!baseUrl) {
+        baseUrl = (await AsyncStorage.getItem('BASE_URL')) || undefined;
+      }
 
       console.log('Fetching user instances...');
-      console.log('Base URL:', client.defaults.baseURL);
+      console.log('Base URL:', baseUrl);
 
-      // Get the instance URL from BASE_URL (format: {instance_url}/api/courier/v1)
-      const baseUrl = client.defaults.baseURL;
       if (!baseUrl) {
         console.warn('No BASE_URL set');
         return [];

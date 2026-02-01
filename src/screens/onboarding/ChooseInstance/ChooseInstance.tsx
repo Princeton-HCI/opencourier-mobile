@@ -21,7 +21,6 @@ import { PopularNearbyInstances } from '@app/components/PopularNearbyInstances/P
 import { InstanceCell } from '@app/components/InstanceCell/InstanceCell';
 import { Instance } from '@app/types/types';
 import { client } from '@app/services/Client';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextField } from '@app/components/TextField/TextField';
 import { Button, ButtonType } from '@app/components/Button/Button';
 import { Colors } from '@app/styles/colors';
@@ -36,7 +35,7 @@ type TextFieldErrors = {
 
 export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
   const { t, i18n } = useTranslation();
-  const { registryLink } = route.params;
+  const { registryLink, mode } = route.params;
   const [text, setText] = useState<string>('');
   const [instances, setInstances] = useState<Instance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -55,20 +54,11 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
   };
 
   const onInstancePress = async (instance: Instance) => {
-    console.log('Setting base url:', instance.details.link);
     refreshRegistration(instance.details.link);
-    client.defaults.baseURL = instance.details.link + '/api/courier/v1';
-    await AsyncStorage.setItem(
-      'BASE_URL',
-      instance.details.link + '/api/courier/v1',
-    );
-    await AsyncStorage.setItem(
-      'SOCKET_BASE_URL',
-      instance.details.websocketLink,
-    );
     navigation.navigate(OnboardingScreen.InstanceDetails, {
       instanceLink: instance.details.link,
       registryLink: registryLink,
+      mode: mode,
     });
   };
 
@@ -102,7 +92,7 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate(OnboardingScreen.Welcome);
+      navigation.navigate(OnboardingScreen.Welcome, { mode: mode });
     }
   };
 
@@ -170,17 +160,6 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
                 {t('translations:loading')}
               </Text>
             )}
-            <Button
-              style={[
-                styles.buttonContinue,
-                { marginBottom: 22, marginTop: 22 },
-              ]}
-              iconPosition="left"
-              type={ButtonType.grayBGBlackText}
-              icon={Images.ArrowLeft}
-              title={'Back'}
-              onPress={() => navigation.goBack()}
-            />
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
