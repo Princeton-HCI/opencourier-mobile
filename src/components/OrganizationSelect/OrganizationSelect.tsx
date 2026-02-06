@@ -25,7 +25,7 @@ export const OrganizationSelect = ({ style, organization, onPress }: Props) => {
         onPress={() => onPress(organization)}>
         <Image source={{ uri: organization.imageUrl }} style={styles.icon} />
         <Text style={styles.text}>{organization.name}</Text>
-        <Image style={styles.dropdown} source={Images.Dropdown} />
+        {/* <Image style={styles.dropdown} source={Images.Dropdown} /> */}
       </TouchableOpacity>
     </View>
   );

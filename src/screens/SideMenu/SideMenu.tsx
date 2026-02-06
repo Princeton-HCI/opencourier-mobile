@@ -215,12 +215,7 @@ export const SideMenu = ({ navigation }: Props) => {
           <OrganizationSelect
             style={styles.cell}
             organization={selectedOrg}
-            onPress={() =>
-              navigation.navigate(RootScreen.SelectOrganizationModal, {
-                preselected: selectedOrg,
-                onOrganizationSelect: organizationSelected,
-              })
-            }
+            onPress={() => {}}
           />
         )}
         <UserStatusSelector
