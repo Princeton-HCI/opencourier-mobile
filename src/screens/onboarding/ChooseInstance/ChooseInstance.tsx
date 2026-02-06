@@ -40,30 +40,36 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
   const [instances, setInstances] = useState<Instance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const refreshRegistration = async (instanceLink: string) => {
-    if (!registryLink) return;
-    try {
-      const sanitizedRegistryLink = registryLink.trim().replace(/\/$/, '');
-      const sanitizedInstanceLink = instanceLink.trim().replace(/\/$/, '');
-      await client.post(`${sanitizedRegistryLink}/registrations/refresh`, {
-        instanceLink: sanitizedInstanceLink,
-      });
-    } catch (err) {
-      console.error('Error refreshing registration:', err);
-    }
-  };
-
-  const onInstancePress = async (instance: Instance) => {
-    refreshRegistration(instance.details.link);
-    navigation.navigate(OnboardingScreen.InstanceDetails, {
-      instanceLink: instance.details.link,
-      registryLink: registryLink,
-    });
-  };
-
   useEffect(() => {
     i18n.changeLanguage('en');
   }, [i18n]);
+
+  const refreshRegistration = useCallback(
+    async (instanceLink: string) => {
+      if (!registryLink) return;
+      try {
+        const sanitizedRegistryLink = registryLink.trim().replace(/\/$/, '');
+        const sanitizedInstanceLink = instanceLink.trim().replace(/\/$/, '');
+        await client.post(`${sanitizedRegistryLink}/registrations/refresh`, {
+          instanceLink: sanitizedInstanceLink,
+        });
+      } catch (err) {
+        console.error('Error refreshing registration:', err);
+      }
+    },
+    [registryLink],
+  );
+
+  const onInstancePress = useCallback(
+    async (instance: Instance) => {
+      refreshRegistration(instance.details.link);
+      navigation.navigate(OnboardingScreen.InstanceDetails, {
+        instanceLink: instance.details.link,
+        registryLink: registryLink,
+      });
+    },
+    [navigation, registryLink, refreshRegistration],
+  );
 
   const fetchInstances = useCallback(async () => {
     if (!registryLink) return;
@@ -81,7 +87,7 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchInstances();
+      void fetchInstances();
     }, [fetchInstances]),
   );
 
@@ -159,17 +165,6 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
                 {t('translations:loading')}
               </Text>
             )}
-            <Button
-              style={[
-                styles.buttonContinue,
-                { marginBottom: 22, marginTop: 22 },
-              ]}
-              iconPosition="left"
-              type={ButtonType.grayBGBlackText}
-              icon={Images.ArrowLeft}
-              title={'Back'}
-              onPress={() => navigation.goBack()}
-            />
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>

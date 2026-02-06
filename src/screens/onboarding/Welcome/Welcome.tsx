@@ -28,7 +28,7 @@ type TextFieldErrors = {
 
 export const WelcomeScreen = ({ navigation }: Props) => {
   const { t, i18n } = useTranslation();
-  const [registryLink, setRegistryLink] = useState<string>('');
+  const [registryLink, setRegistryLink] = useState<string>('https://opencourier-demo-registry.onrender.com/');
   const [instanceLink, setInstanceLink] = useState<string>('');
   const [errors, setErrors] = useState<TextFieldErrors>({
     registryLink: undefined,
