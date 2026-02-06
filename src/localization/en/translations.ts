@@ -7,6 +7,8 @@ export default {
   loading: 'Loading...',
   registry_link: 'Registry link',
   last_fetched_at: 'Last fetched at:',
+  privacy_policy: 'Privacy Policy',
+  terms_of_service: 'Terms of Service',
   something_went_wrong: 'Something went wrong',
   popular_nearby: 'Popular nearby instances',
   user_count: 'User count',

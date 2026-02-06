@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, SafeAreaView, Text, ScrollView } from 'react-native';
+import {
+  View,
+  Image,
+  SafeAreaView,
+  Text,
+  ScrollView,
+  Linking,
+  TouchableOpacity,
+} from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { Images } from '@app/utilities/images';
 import {
@@ -148,6 +156,44 @@ export const InstanceDetails = ({ navigation, route }: Props) => {
                 {tab === InstanceTabItem.Description ? description : rules}
               </Markdown>
             </ScrollView>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 16,
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (instance?.details.termsOfServiceUrl) {
+                    Linking.openURL(instance?.details.termsOfServiceUrl);
+                  }
+                }}>
+                <Text
+                  style={{
+                    color: '#434343',
+                    textDecorationLine: 'underline',
+                  }}>
+                  {t('translations:terms_of_service')}
+                </Text>
+              </TouchableOpacity>
+              <Text style={{ color: '#434343' }}>|</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  if (instance?.details.privacyPolicyUrl) {
+                    Linking.openURL(instance?.details.privacyPolicyUrl);
+                  }
+                }}>
+                <Text
+                  style={{
+                    color: '#434343',
+                    textDecorationLine: 'underline',
+                  }}>
+                  {t('translations:privacy_policy')}
+                </Text>
+              </TouchableOpacity>
+            </View>
             <Button
               icon={Images.PlusCircle}
               type={ButtonType.green}
