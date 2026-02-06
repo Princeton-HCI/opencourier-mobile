@@ -74,13 +74,12 @@ export const SelectOrganizationModal = ({ navigation, route }: Props) => {
             }
           />
         )}
-        {/* want to navigate to the welcome screens here*/}
-        <View style={[styles.contentButton, { paddingBottom: bottom }]}>
+        {/* <View style={[styles.contentButton, { paddingBottom: bottom }]}>
           <TouchableOpacity style={styles.buttonAdd} onPress={() => {}}>
             <Image source={Images.Plus} style={styles.plus} />
             <Text style={styles.textAdd}>{t('translations:add_instance')}</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </View>
   );
