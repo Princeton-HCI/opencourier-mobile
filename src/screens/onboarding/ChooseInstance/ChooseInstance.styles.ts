@@ -21,7 +21,6 @@ export const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 12,
-    paddingBottom: 32,
   },
   imageOpenDeli: {
     marginVertical: 32,

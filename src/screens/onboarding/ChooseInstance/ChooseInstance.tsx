@@ -109,12 +109,10 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
           <BackNavButton onPress={handleBack} />
         </View>
         <KeyboardAvoidingView
-          style={styles.screen}
+          style={[styles.screen, { flexDirection: 'column' }]}
           enabled
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView
-            style={styles.screen}
-            contentContainerStyle={styles.content}>
+          <View style={[styles.content, { flexShrink: 1 }]}>
             <Image source={Images.OpenDeli} style={styles.imageOpenDeli} />
             <Text style={styles.textSubtitle}>
               {t('translations:registry_link') + ': '}
@@ -154,18 +152,20 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
                     );
                   })}
             </View>
-            {!loading && instances.length > 0 && (
-              <PopularNearbyInstances
-                instances={instances}
-                onPress={instance => onInstancePress(instance)}
-              />
-            )}
             {loading && (
               <Text style={styles.textSubtitle}>
                 {t('translations:loading')}
               </Text>
             )}
-          </ScrollView>
+          </View>
+          {!loading && instances.length > 0 && (
+            <View style={{ flex: 1, paddingBottom: 32 }}>
+              <PopularNearbyInstances
+                instances={instances}
+                onPress={instance => onInstancePress(instance)}
+              />
+            </View>
+          )}
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
