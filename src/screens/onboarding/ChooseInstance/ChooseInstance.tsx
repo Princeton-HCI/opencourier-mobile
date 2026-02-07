@@ -25,6 +25,8 @@ import { TextField } from '@app/components/TextField/TextField';
 import { Button, ButtonType } from '@app/components/Button/Button';
 import { Colors } from '@app/styles/colors';
 import { BackNavButton } from '@app/components/BackNavButton/BackNavButton';
+import UserContext from '@app/context/userContext';
+import { useContext } from 'react';
 
 type Props = OnboardingScreenProp<OnboardingScreen.ChooseInstance>;
 
@@ -39,10 +41,44 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
   const [text, setText] = useState<string>('');
   const [instances, setInstances] = useState<Instance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [locationGracePassed, setLocationGracePassed] = useState<boolean>(false);
+  const { userLatitude, userLongitude } = useContext(UserContext);
+  const isLocationMissing = userLatitude == null || userLongitude == null;
 
   useEffect(() => {
+    console.log('[ChooseInstance] Screen loaded');
+    console.log('[ChooseInstance] Raw context values:', {
+      userLatitude,
+      userLongitude,
+    });
+    if (userLatitude !== null && userLongitude !== null) {
+      console.log('[ChooseInstance] User Location (formatted):', {
+        latitude: userLatitude.toFixed(6),
+        longitude: userLongitude.toFixed(6),
+      });
+    } else {
+      console.log('[ChooseInstance] Location values are null/undefined', {
+        userLatitude,
+        userLongitude,
+      });
+    }
     i18n.changeLanguage('en');
-  }, [i18n]);
+  }, [userLatitude, userLongitude, i18n]);
+
+  useEffect(() => {
+    if (!isLocationMissing) {
+      setLocationGracePassed(false);
+      return;
+    }
+
+    setLoading(true);
+    setLocationGracePassed(false);
+    const timer = setTimeout(() => {
+      setLocationGracePassed(true);
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [isLocationMissing]);
 
   const refreshRegistration = useCallback(
     async (instanceLink: string) => {
@@ -73,9 +109,24 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
 
   const fetchInstances = useCallback(async () => {
     if (!registryLink) return;
+    if (isLocationMissing) {
+      if (locationGracePassed) {
+        setInstances([]);
+        setLoading(false);
+      }
+      return;
+    }
+
     try {
       setLoading(true);
-      const response = await client.get(`${registryLink}/instances`);
+
+      const response = await client.get(`${registryLink}/instances`, {
+        params: {
+          lat: userLatitude,
+          lng: userLongitude,
+        },
+      });
+
       setInstances(response.data.instances);
     } catch (error) {
       console.error('Error fetching instances:', error);
@@ -83,7 +134,13 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
     } finally {
       setLoading(false);
     }
-  }, [registryLink]);
+  }, [
+    registryLink,
+    userLatitude,
+    userLongitude,
+    isLocationMissing,
+    locationGracePassed,
+  ]);
 
   useFocusEffect(
     useCallback(() => {
@@ -121,6 +178,11 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
             <Text style={styles.textSubtitle}>
               {t('translations:choose_instance')}
             </Text>
+            {!loading && isLocationMissing && locationGracePassed && (
+              <Text style={styles.textSubtitle}>
+                {t('translations:enable_location_warning')}
+              </Text>
+            )}
             <SearchBar
               text={text}
               onTextChange={setText}

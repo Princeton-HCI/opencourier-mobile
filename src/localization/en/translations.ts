@@ -14,6 +14,7 @@ export default {
   user_count: 'User count',
   description: 'Description',
   rules: 'Rules',
+  enable_location_warning: 'Enable location access to see nearby instances.',
   join_instance: 'Join Instance',
   login_to_instance: 'Log In To Instance',
   join: 'Join',
@@ -344,6 +345,10 @@ export default {
     'Please provide us access to your notifications, so you don’t miss any order requests.',
   skip: 'Skip',
   allow: 'Allow',
+  allowed: 'Allowed',
+  location_allowed: 'Location Allowed',
+  camera_allowed: 'Camera Allowed',
+  notifications_allowed: 'Notifications Allowed',
   report_incident: 'Report an Incident',
   report_incident_text:
     'To address any misconduct from restaurants or customers, please identify the incident by its date and time. For privacy, our system keeps customer details confidential.',
