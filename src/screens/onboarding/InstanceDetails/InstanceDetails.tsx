@@ -145,7 +145,11 @@ export const InstanceDetails = ({ navigation, route }: Props) => {
               style={{ marginTop: 16, marginBottom: 22 }}
               type={ButtonType.grayBGBlackText}
               title={'Retry'}
-              onPress={fetchMetadata}
+              onPress={() => {
+                fetchMetadata();
+                fetchDescription();
+                fetchRules();
+              }}
             />
           </ScrollView>
         ) : (
@@ -162,7 +166,7 @@ export const InstanceDetails = ({ navigation, route }: Props) => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: 8,
-                marginBottom: 16,
+                marginBottom: 22,
               }}>
               <TouchableOpacity
                 onPress={() => {

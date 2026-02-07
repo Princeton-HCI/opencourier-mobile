@@ -19,11 +19,8 @@ export const styles = StyleSheet.create({
     marginBottom: 22,
     paddingTop: 16,
   },
-  content: {
-    paddingHorizontal: 12,
-  },
   imageOpenDeli: {
-    marginVertical: 32,
+    marginVertical: 0,
     marginBottom: 10,
   },
   buttonContinue: {
@@ -42,7 +39,8 @@ export const styles = StyleSheet.create({
   },
   textSubtitle: {
     fontSize: 18,
-    marginBottom: 22,
+    marginBottom: 16,
+    fontWeight: '500',
     color: Colors.black,
   },
   linkText: {

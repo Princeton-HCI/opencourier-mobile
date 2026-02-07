@@ -41,7 +41,8 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
   const [text, setText] = useState<string>('');
   const [instances, setInstances] = useState<Instance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [locationGracePassed, setLocationGracePassed] = useState<boolean>(false);
+  const [locationGracePassed, setLocationGracePassed] =
+    useState<boolean>(false);
   const { userLatitude, userLongitude } = useContext(UserContext);
   const isLocationMissing = userLatitude == null || userLongitude == null;
 
@@ -165,16 +166,37 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
         <View style={styles.header}>
           <BackNavButton onPress={handleBack} />
         </View>
+        <Image source={Images.OpenDeli} style={styles.imageOpenDeli} />
         <KeyboardAvoidingView
           style={[styles.screen, { flexDirection: 'column' }]}
           enabled
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View style={[styles.content, { flexShrink: 1 }]}>
-            <Image source={Images.OpenDeli} style={styles.imageOpenDeli} />
-            <Text style={styles.textSubtitle}>
-              {t('translations:registry_link') + ': '}
-              <Text style={styles.linkText}>{registryLink}</Text>
-            </Text>
+          <View style={{ flexShrink: 1 }}>
+            <View style={{ width: '100%', marginBottom: 16 }}>
+              <Text
+                style={{
+                  marginBottom: 8,
+                  fontWeight: '500',
+                  color: '#333',
+                }}>
+                {t('translations:registry_link') + ': '}
+              </Text>
+              <View
+                style={{
+                  backgroundColor: Colors.blue5,
+                  borderRadius: 10,
+                  padding: 12,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={{ color: Colors.gray2, flex: 1 }}>
+                  {registryLink}
+                </Text>
+              </View>
+            </View>
             <Text style={styles.textSubtitle}>
               {t('translations:choose_instance')}
             </Text>
@@ -190,7 +212,7 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
             />
             <View
               style={[
-                text.length === 0 && { height: 40 },
+                text.length === 0 && { height: 20 },
                 text.length > 0 && { marginVertical: 20 },
               ]}>
               {text.length > 0 &&

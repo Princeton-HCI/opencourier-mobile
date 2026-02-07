@@ -35,6 +35,7 @@ export const styles = StyleSheet.create({
   textSubtitle: {
     fontSize: 18,
     marginBottom: 22,
+    fontWeight: '500',
     color: Colors.black,
   },
   buttonSignup: {

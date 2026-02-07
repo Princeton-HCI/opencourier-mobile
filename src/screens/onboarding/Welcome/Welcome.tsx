@@ -103,18 +103,22 @@ export const WelcomeScreen = ({ navigation }: Props) => {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginVertical: 20,
+                marginBottom: 15,
               }}>
               {/* Left line */}
-              <View style={{ flex: 1, height: 1, backgroundColor: '#000' }} />
+              <View
+                style={{ flex: 1, height: 1, backgroundColor: Colors.gray3 }}
+              />
 
               {/* Text in the middle */}
-              <Text style={{ marginHorizontal: 10, color: Colors.black1 }}>
+              <Text style={{ marginHorizontal: 10, color: Colors.gray2 }}>
                 {t('translations:or')}
               </Text>
 
               {/* Right line */}
-              <View style={{ flex: 1, height: 1, backgroundColor: '#000' }} />
+              <View
+                style={{ flex: 1, height: 1, backgroundColor: Colors.gray3 }}
+              />
             </View>
             <Text style={styles.textSubtitle}>
               {t('translations:input_instance_link')}
