@@ -25,7 +25,6 @@ export const PopularNearbyInstances = ({
   onPress,
 }: Props) => {
   const { t } = useTranslation();
-  console.log('popular', instances);
 
   return (
     <View style={[styles.container, { flex: 1 }]}>

@@ -17,9 +17,9 @@ type Props = {
   onPress: (instance: Instance) => void;
 };
 
-const { t } = useTranslation();
-
 export const InstanceCell = ({ style, instance, onPress }: Props) => {
+  const { t } = useTranslation();
+
   return (
     <TouchableOpacity onPress={() => onPress(instance)}>
       <View style={[styles.container, style]}>
