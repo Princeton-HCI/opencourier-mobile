@@ -33,7 +33,7 @@ export const PopularNearbyInstances = ({
         <Text style={styles.textTitle}>{t('translations:popular_nearby')}</Text>
       </View>
       <FlatList
-        data={instances}
+        data={instances.slice(0, 5)}
         renderItem={({ item }) => (
           <InstanceCell instance={item} onPress={onPress} />
         )}

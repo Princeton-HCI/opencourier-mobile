@@ -172,31 +172,6 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
           enabled
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={{ flexShrink: 1 }}>
-            <View style={{ width: '100%', marginBottom: 16 }}>
-              <Text
-                style={{
-                  marginBottom: 8,
-                  fontWeight: '500',
-                  color: '#333',
-                }}>
-                {t('translations:registry_link') + ': '}
-              </Text>
-              <View
-                style={{
-                  backgroundColor: Colors.blue5,
-                  borderRadius: 10,
-                  padding: 12,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={{ color: Colors.gray2, flex: 1 }}>
-                  {registryLink}
-                </Text>
-              </View>
-            </View>
             <Text style={styles.textSubtitle}>
               {t('translations:choose_instance')}
             </Text>
@@ -205,44 +180,14 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
                 {t('translations:enable_location_warning')}
               </Text>
             )}
-            <SearchBar
-              text={text}
-              onTextChange={setText}
-              style={{ marginHorizontal: 0 }}
-            />
-            <View
-              style={[
-                text.length === 0 && { height: 20 },
-                text.length > 0 && { marginVertical: 20 },
-              ]}>
-              {text.length > 0 &&
-                instances
-                  .filter(
-                    obj =>
-                      obj.details.name
-                        ?.toLowerCase()
-                        .includes(text.toLowerCase()) ||
-                      obj.details.link
-                        ?.toLowerCase()
-                        .includes(text.toLowerCase()),
-                  )
-                  .map(obj => {
-                    return (
-                      <InstanceCell
-                        key={obj.details.link}
-                        instance={obj}
-                        onPress={instance => onInstancePress(instance)}
-                      />
-                    );
-                  })}
-            </View>
+
             {loading && (
               <Text style={styles.textSubtitle}>
                 {t('translations:loading')}
               </Text>
             )}
           </View>
-          {!loading && instances.length > 0 && (
+          {text.length === 0 && !loading && instances.length > 0 && (
             <View style={{ flex: 1, paddingBottom: 32 }}>
               <PopularNearbyInstances
                 instances={instances}
@@ -250,6 +195,38 @@ export const ChooseInstanceScreen = ({ navigation, route }: Props) => {
               />
             </View>
           )}
+          <SearchBar
+            text={text}
+            onTextChange={setText}
+            style={{ marginHorizontal: 0 }}
+          />
+          <View
+            style={[
+              text.length === 0 && { height: 20 },
+              text.length > 0 && { marginVertical: 20 },
+              { paddingBottom: 32 },
+            ]}>
+            {text.length > 0 &&
+              instances
+                .filter(
+                  obj =>
+                    obj.details.name
+                      ?.toLowerCase()
+                      .includes(text.toLowerCase()) ||
+                    obj.details.link
+                      ?.toLowerCase()
+                      .includes(text.toLowerCase()),
+                )
+                .map(obj => {
+                  return (
+                    <InstanceCell
+                      key={obj.details.link}
+                      instance={obj}
+                      onPress={instance => onInstancePress(instance)}
+                    />
+                  );
+                })}
+          </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
