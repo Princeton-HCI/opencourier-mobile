@@ -25,7 +25,7 @@ export const OrganizationCell = ({
   organization,
   selected,
 }: Props) => {
-  const { imageUrl, name, iconUrl } = organization;
+  const { imageUrl, name } = organization;
   return (
     <TouchableOpacity
       style={[styles.container, style]}
@@ -40,9 +40,6 @@ export const OrganizationCell = ({
             ]}>
             {name}
           </Text>
-          {iconUrl && (
-            <Image source={{ uri: iconUrl }} style={styles.imageRight} />
-          )}
         </View>
         {selected && (
           <Image style={styles.checkmark} source={Images.CheckmarkGreen} />
