@@ -4,6 +4,7 @@ import { NavigationProp, RouteProp } from '@react-navigation/native';
 export enum OnboardingScreen {
   Landing = 'Landing',
   Welcome = 'Welcome',
+  ChooseInstance = 'ChooseInstance',
   Login = 'Login',
   Signup = 'Signup',
   ForgotPassword = 'ForgotPassword',
@@ -15,11 +16,15 @@ export enum OnboardingScreen {
 export type OnboardingStackParamList = {
   Landing: undefined;
   Welcome: undefined;
+  ChooseInstance: {
+    registryLink: string;
+  };
   Login: undefined;
   Signup: undefined;
   ForgotPassword: undefined;
   InstanceDetails: {
-    instance: Instance;
+    instanceLink: string;
+    registryLink?: string;
   };
   JoinInstance: {
     instance: Instance;
