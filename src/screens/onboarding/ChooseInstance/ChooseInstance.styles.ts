@@ -2,20 +2,25 @@ import { Colors } from '@app/styles/colors';
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    // backgroundColor: Colors.white,
+    paddingHorizontal: 32,
   },
   safeArea: {
     flex: 1,
     justifyContent: 'center',
   },
-  content: {
-    paddingHorizontal: 32,
-    paddingBottom: 32,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 22,
+    paddingTop: 16,
   },
   imageOpenDeli: {
-    marginVertical: 32,
+    marginVertical: 0,
     marginBottom: 10,
   },
   buttonContinue: {
@@ -34,9 +39,12 @@ export const styles = StyleSheet.create({
   },
   textSubtitle: {
     fontSize: 18,
-    marginBottom: 22,
+    marginBottom: 16,
     fontWeight: '500',
     color: Colors.black,
+  },
+  linkText: {
+    textDecorationLine: 'underline',
   },
   buttonSignup: {
     marginTop: 80,
