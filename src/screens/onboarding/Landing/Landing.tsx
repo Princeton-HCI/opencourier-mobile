@@ -32,7 +32,7 @@ type Page = {
 export const LandingScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
   const { top, bottom } = useSafeAreaInsets();
-  const [page, setPage] = useState<number>(-1);
+  const [page, setPage] = useState<number>(0);
   const ref = useRef<PagerView>(null);
   const { requestCameraPermission, cameraPermission } = useCameraPermission();
   const { requestLocationPermission, locationPermission } =

@@ -77,3 +77,4 @@ yarn-error.log
 
 # VS Code
 .vscode/
+ios/Podfile.lock
