@@ -155,6 +155,12 @@
         "licenseUrl": "https://github.com/react-native-maps/react-native-maps/raw/master/LICENSE",
         "parents": "opencourier"
     },
+    "react-native-markdown-display@7.0.2": {
+        "licenses": "MIT",
+        "repository": "https://github.com/iamacup/react-native-markdown-display",
+        "licenseUrl": "https://github.com/iamacup/react-native-markdown-display/raw/master/LICENSE",
+        "parents": "opencourier"
+    },
     "react-native-page-indicator@2.4.1": {
         "licenses": "MIT",
         "repository": "git+https://kolking@github.com/kolking/react-native-page-indicator",
