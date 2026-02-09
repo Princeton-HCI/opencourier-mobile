@@ -40,9 +40,9 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs access to your Camera.</string>
+	<string>$(PRODUCT_NAME) needs acces to your Camera.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Location is used to detect Driver&apos;s position</string>
+	<string>Location is used to detect Driver&apos;s possition</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

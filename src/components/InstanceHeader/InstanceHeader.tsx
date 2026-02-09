@@ -31,15 +31,12 @@ export const InstanceHeader = ({
             {t(`translations:${headerPurpose}`) + ':'}
           </Text>
           <View style={styles.contentHeader}>
-            <Image
-              source={{ uri: instance.details.imageUrl }}
-              style={styles.image}
-            />
+            <Image source={{ uri: instance.imageUrl }} style={styles.image} />
             <View style={styles.containerHeaderText}>
-              <Text style={styles.textName}>{instance.details.name}</Text>
+              <Text style={styles.textName}>{instance.name}</Text>
               <Text style={styles.textCount}>{`${t(
                 'translations:user_count',
-              )}: ${instance.details.userCount}`}</Text>
+              )}: ${instance.userCount}`}</Text>
             </View>
           </View>
         </View>

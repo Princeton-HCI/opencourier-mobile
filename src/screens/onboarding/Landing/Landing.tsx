@@ -1,18 +1,10 @@
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useContext,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Image,
   Text,
   SafeAreaView,
   ImageSourcePropType,
-  Platform,
-  PermissionsAndroid,
 } from 'react-native';
 import { Images } from '@app/utilities/images';
 import PagerView from 'react-native-pager-view';
@@ -28,8 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { useCameraPermission } from '@app/hooks/useCameraPermission';
 import { useLocationPermission } from '@app/hooks/useLocationPermission';
 import usePushNotifications from '@app/services/notifications';
-import UserContext from '@app/context/userContext';
-import Geolocation from 'react-native-geolocation-service';
 
 type Props = OnboardingScreenProp<OnboardingScreen.Landing>;
 
@@ -43,64 +33,12 @@ export const LandingScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
   const { top, bottom } = useSafeAreaInsets();
   const [page, setPage] = useState<number>(-1);
-  const [permissionRequested, setPermissionRequested] = useState(false);
   const ref = useRef<PagerView>(null);
   const { requestCameraPermission, cameraPermission } = useCameraPermission();
   const { requestLocationPermission, locationPermission } =
     useLocationPermission();
   const { requestUserPermission, permissionsGiven } =
     usePushNotifications(false);
-  const { setUserLatitude, setUserLongitude } = useContext(UserContext);
-
-  // Get and store location when permission is granted
-  useEffect(() => {
-    console.log('[Landing] Location permission changed:', locationPermission);
-    if (locationPermission) {
-      console.log('[Landing] Attempting to fetch location...');
-      const getLocation = async () => {
-        try {
-          if (Platform.OS === 'android') {
-            const hasPermission = await PermissionsAndroid.check(
-              PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            );
-            console.log(
-              '[Landing] Android fine location permission check:',
-              hasPermission,
-            );
-            if (!hasPermission) {
-              console.warn('[Landing] Fine location permission denied');
-              return;
-            }
-          }
-
-          Geolocation.getCurrentPosition(
-            (position: any) => {
-              const { latitude, longitude } = position.coords;
-              console.log('[Landing] Position received:', {
-                latitude,
-                longitude,
-              });
-              setUserLatitude(latitude);
-              setUserLongitude(longitude);
-              console.log('[Landing] Location stored in context:', {
-                latitude: latitude.toFixed(6),
-                longitude: longitude.toFixed(6),
-              });
-            },
-            (error: any) => {
-              console.warn('[Landing] Location error:', error);
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
-          );
-        } catch (error) {
-          console.warn('[Landing] Get location error:', error);
-        }
-      };
-      getLocation();
-    } else {
-      console.log('[Landing] Location permission not granted yet');
-    }
-  }, [locationPermission, setUserLatitude, setUserLongitude]);
 
   const data: Page[] = [
     {
@@ -151,43 +89,15 @@ export const LandingScreen = ({ navigation }: Props) => {
     }
   };
 
-  const getPermissionButtonState = () => {
-    if (page === 3) return locationPermission;
-    if (page === 4) return cameraPermission;
-    if (page === 5) return permissionsGiven;
-    return false;
-  };
-
-  const getPermissionButtonTitle = () => {
-    const isAllowed = getPermissionButtonState();
-    if (page === 3) {
-      return isAllowed
-        ? t('translations:location_allowed')
-        : t('translations:allow');
-    }
-    if (page === 4) {
-      return isAllowed
-        ? t('translations:camera_allowed')
-        : t('translations:allow');
-    }
-    if (page === 5) {
-      return isAllowed
-        ? t('translations:notifications_allowed')
-        : t('translations:allow');
-    }
-    return t('translations:allow');
-  };
-
   const onAskForPermission = () => {
     if (page === 3) {
       requestLocationPermission();
-      setPermissionRequested(true);
-    } else if (page === 4) {
+    }
+    if (page === 4) {
       requestCameraPermission();
-      setPermissionRequested(true);
-    } else if (page === 5) {
+    }
+    if (page === 5) {
       requestUserPermission();
-      setPermissionRequested(true);
     }
   };
 
@@ -205,25 +115,8 @@ export const LandingScreen = ({ navigation }: Props) => {
   );
 
   useEffect(() => {
-    if (permissionRequested) {
-      if (page === 3 && locationPermission) {
-        setPermissionRequested(false);
-        onContinue();
-      } else if (page === 4 && cameraPermission) {
-        setPermissionRequested(false);
-        onContinue();
-      } else if (page === 5 && permissionsGiven) {
-        setPermissionRequested(false);
-        onContinue();
-      }
-    }
-  }, [
-    cameraPermission,
-    locationPermission,
-    permissionsGiven,
-    permissionRequested,
-    page,
-  ]);
+    onContinue();
+  }, [cameraPermission, locationPermission, permissionsGiven]);
 
   return (
     <View style={styles.container}>
@@ -257,9 +150,8 @@ export const LandingScreen = ({ navigation }: Props) => {
               iconPosition="right"
               type={ButtonType.green}
               icon={Images.CheckWhite}
-              title={getPermissionButtonTitle()}
+              title={t('translations:allow')}
               onPress={onAskForPermission}
-              disabled={getPermissionButtonState()}
             />
           )}
           <Button

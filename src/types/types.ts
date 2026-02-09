@@ -338,10 +338,13 @@ export enum MapDestination {
 }
 
 export type Instance = {
-  registry?: any;
-  details: any;
-  config: any;
-  updatedAt: any;
+  name: string;
+  imageUrl: string;
+  link: string;
+  ws_link: string;
+  userCount: number;
+  description: string;
+  rules: string;
 };
 
 export enum SettingsOptions {
