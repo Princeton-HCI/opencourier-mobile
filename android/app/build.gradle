@@ -123,9 +123,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-    
-    // Google Play Services Location for geolocation
-    implementation("com.google.android.gms:play-services-location:21.0.1")
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

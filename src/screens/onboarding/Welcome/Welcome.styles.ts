@@ -18,14 +18,6 @@ export const styles = StyleSheet.create({
     marginVertical: 32,
     marginBottom: 10,
   },
-  buttonContinue: {
-    marginHorizontal: 32,
-    height: 48,
-  },
-  textField: {
-    marginBottom: 22,
-    color: Colors.black,
-  },
   textTitle: {
     fontSize: 56,
     fontWeight: '700',
@@ -35,7 +27,6 @@ export const styles = StyleSheet.create({
   textSubtitle: {
     fontSize: 18,
     marginBottom: 22,
-    fontWeight: '500',
     color: Colors.black,
   },
   buttonSignup: {

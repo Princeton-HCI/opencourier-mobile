@@ -15,59 +15,33 @@ import {
 } from '@app/navigation/onboarding/types';
 import { styles } from './Welcome.styles';
 import { useTranslation } from 'react-i18next';
-import { TextField } from '@app/components/TextField/TextField';
-import { Button, ButtonType } from '@app/components/Button/Button';
-import { Colors } from '@app/styles/colors';
+import { SearchBar } from '@app/components/SearchBar/SearchBar';
+import { PopularNearbyInstances } from '@app/components/PopularNearbyInstances/PopularNearbyInstances';
+import { TEST_INSTANCES } from '@app/utilities/testData';
+import { InstanceCell } from '@app/components/InstanceCell/InstanceCell';
+import { Instance } from '@app/types/types';
+import { client } from '@app/services/Client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = OnboardingScreenProp<OnboardingScreen.Welcome>;
 
-type TextFieldErrors = {
-  registryLink: string | undefined;
-  instanceLink: string | undefined;
-};
-
 export const WelcomeScreen = ({ navigation }: Props) => {
   const { t, i18n } = useTranslation();
-  const [registryLink, setRegistryLink] = useState<string>(
-    'https://opencourier-demo-registry.onrender.com/',
-  );
-  const [instanceLink, setInstanceLink] = useState<string>('');
-  const [errors, setErrors] = useState<TextFieldErrors>({
-    registryLink: undefined,
-    instanceLink: undefined,
-  });
+  const [text, setText] = useState<string>('');
 
-  const validateFields = () => {
-    var registryLinkError: string | undefined;
-    var instanceLinkError: string | undefined;
-
-    if (registryLink.length > 0) {
-    }
-
-    setErrors({
-      registryLink: registryLinkError,
-      instanceLink: instanceLinkError,
+  const onInstancePress = async (instance: Instance) => {
+    console.log('Setting base url:', instance.link);
+    client.defaults.baseURL = instance.link;
+    await AsyncStorage.setItem('BASE_URL', instance.link);
+    await AsyncStorage.setItem('SOCKET_BASE_URL', instance.ws_link);
+    navigation.navigate(OnboardingScreen.InstanceDetails, {
+      instance: instance,
     });
   };
 
   useEffect(() => {
     i18n.changeLanguage('en');
   }, [i18n]);
-
-  const nextStep = (registryLink: string, instanceLink: string) => {
-    const sanitizedRegistryLink = registryLink.trim().replace(/\/$/, '');
-    const sanitizedInstanceLink = instanceLink.trim().replace(/\/$/, '');
-
-    if (sanitizedInstanceLink.length > 0) {
-      navigation.navigate(OnboardingScreen.InstanceDetails, {
-        instanceLink: sanitizedInstanceLink,
-      });
-    } else {
-      navigation.navigate(OnboardingScreen.ChooseInstance, {
-        registryLink: sanitizedRegistryLink,
-      });
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -88,61 +62,32 @@ export const WelcomeScreen = ({ navigation }: Props) => {
               {t('translations:welcome')}
             </Text>
             <Text style={styles.textSubtitle}>
-              {t('translations:input_registry_link')}
+              {t('translations:choose_instance')}
             </Text>
-            <TextField
-              key={'registrylink'}
-              error={errors.registryLink}
-              value={registryLink}
-              placeholder={'Registry Link'}
-              onChangeText={setRegistryLink}
-              onBlur={validateFields}
-              style={styles.textField}
+            <SearchBar
+              text={text}
+              onTextChange={setText}
+              style={{ marginHorizontal: 0 }}
             />
             <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 15,
-              }}>
-              {/* Left line */}
-              <View
-                style={{ flex: 1, height: 1, backgroundColor: Colors.gray3 }}
-              />
-
-              {/* Text in the middle */}
-              <Text style={{ marginHorizontal: 10, color: Colors.gray2 }}>
-                {t('translations:or')}
-              </Text>
-
-              {/* Right line */}
-              <View
-                style={{ flex: 1, height: 1, backgroundColor: Colors.gray3 }}
-              />
+              style={[
+                text.length === 0 && { height: 40 },
+                text.length > 0 && { marginVertical: 20 },
+              ]}>
+              {text.length > 0 &&
+                TEST_INSTANCES.map(obj => {
+                  return (
+                    <InstanceCell
+                      key={obj.link}
+                      instance={obj}
+                      onPress={instance => onInstancePress(instance)}
+                    />
+                  );
+                })}
             </View>
-            <Text style={styles.textSubtitle}>
-              {t('translations:input_instance_link')}
-            </Text>
-            <TextField
-              key={'instancelink'}
-              error={errors.instanceLink}
-              value={instanceLink}
-              placeholder={'Instance Link'}
-              onChangeText={setInstanceLink}
-              onBlur={validateFields}
-              style={styles.textField}
-            />
-            <Button
-              style={[styles.buttonContinue, { marginBottom: 22 }]}
-              disabled={
-                registryLink.trim().length === 0 &&
-                instanceLink.trim().length === 0
-              }
-              iconPosition="right"
-              type={ButtonType.grayBGBlackText}
-              icon={Images.ArrowRightThin}
-              title={t('translations:continue')}
-              onPress={() => nextStep(registryLink, instanceLink)}
+            <PopularNearbyInstances
+              instances={TEST_INSTANCES}
+              onPress={instance => onInstancePress(instance)}
             />
           </ScrollView>
         </KeyboardAvoidingView>

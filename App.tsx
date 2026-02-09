@@ -15,8 +15,6 @@ const queryClient = new QueryClient();
 const App = () => {
   const [watchId, setWatchId] = useState<number | undefined>(undefined);
   const [locationPermission, setLocationPermission] = useState<boolean>(false);
-  const [userLatitude, setUserLatitude] = useState<number | null>(null);
-  const [userLongitude, setUserLongitude] = useState<number | null>(null);
 
   return (
     <UserContext.Provider
@@ -25,10 +23,6 @@ const App = () => {
         setWatchId,
         locationPermission,
         setLocationPermission,
-        userLatitude,
-        setUserLatitude,
-        userLongitude,
-        setUserLongitude,
       }}>
       <QueryClientProvider client={queryClient}>
         <NavigationContainer>

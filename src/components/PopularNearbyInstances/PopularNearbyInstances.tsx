@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  StyleProp,
-  ViewStyle,
-  View,
-  Image,
-  Text,
-  FlatList,
-} from 'react-native';
+import { StyleProp, ViewStyle, View, Image, Text } from 'react-native';
 import { styles } from './PopularNearbyInstances.styles';
 import { Instance } from '@app/types/types';
 import { Images } from '@app/utilities/images';
@@ -27,18 +20,14 @@ export const PopularNearbyInstances = ({
   const { t } = useTranslation();
 
   return (
-    <View style={[styles.container, { flex: 1 }]}>
+    <View style={styles.container}>
       <View style={[styles.containerHeader, style]}>
         <Image source={Images.Sparkle} />
         <Text style={styles.textTitle}>{t('translations:popular_nearby')}</Text>
       </View>
-      <FlatList
-        data={instances.slice(0, 5)}
-        renderItem={({ item }) => (
-          <InstanceCell instance={item} onPress={onPress} />
-        )}
-        keyExtractor={item => item.details.link}
-      />
+      {instances.map(obj => {
+        return <InstanceCell instance={obj} onPress={onPress} />;
+      })}
     </View>
   );
 };
