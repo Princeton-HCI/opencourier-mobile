@@ -5,6 +5,7 @@ import { LoadingScreen } from '@app/screens/Loading/Loading';
 import { OnboardingStack } from '@app/navigation/onboarding/OnboardingNavigation';
 import { MainStack } from './main/MainNavigation';
 import { SelectOrganizationModal } from '@app/screens/SelectOrganizationModal/SelectOrganizationModal';
+import { SearchOrganization } from '@app/screens/SearchOrganization/SearchOrganization';
 import { StatusPopupScreen } from '@app/screens/StatusPopup/StatusPopupScreen';
 import usePushNotifications from '@app/services/notifications';
 import { AddNote } from '@app/screens/AddNote/AddNote';
@@ -78,6 +79,14 @@ export const Router = () => {
             name={RootScreen.SelectOrganizationModal}
             component={SelectOrganizationModal}
             options={{ headerShown: false, presentation: 'transparentModal' }}
+          />
+          <RootStack.Screen
+            name={RootScreen.SearchOrganization}
+            component={SearchOrganization}
+            options={{
+              headerShown: false,
+              presentation: 'transparentModal',
+            }}
           />
           <RootStack.Screen
             name={RootScreen.UserStatusModal}
