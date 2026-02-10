@@ -88,13 +88,16 @@ export const WelcomeScreen = ({ navigation }: Props) => {
               {t('translations:welcome')}
             </Text>
             <Text style={styles.textSubtitle}>
-              {t('translations:input_registry_link')}
+              {t('translations:looking_for_start')}
+            </Text>
+            <Text style={styles.textDescription}>
+              {t('translations:browse_nearby')}
             </Text>
             <TextField
               key={'registrylink'}
               error={errors.registryLink}
               value={registryLink}
-              placeholder={'Registry Link'}
+              placeholder={t('translations:registry_link')}
               onChangeText={setRegistryLink}
               onBlur={validateFields}
               style={styles.textField}
@@ -121,13 +124,16 @@ export const WelcomeScreen = ({ navigation }: Props) => {
               />
             </View>
             <Text style={styles.textSubtitle}>
-              {t('translations:input_instance_link')}
+              {t('translations:know_where_go')}
+            </Text>
+            <Text style={styles.textDescription}>
+              {t('translations:join_directly')}
             </Text>
             <TextField
               key={'instancelink'}
               error={errors.instanceLink}
               value={instanceLink}
-              placeholder={'Instance Link'}
+              placeholder={t('translations:instance_link')}
               onChangeText={setInstanceLink}
               onBlur={validateFields}
               style={styles.textField}

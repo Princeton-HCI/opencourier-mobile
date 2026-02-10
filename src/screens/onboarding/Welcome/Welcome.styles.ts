@@ -34,9 +34,15 @@ export const styles = StyleSheet.create({
   },
   textSubtitle: {
     fontSize: 18,
-    marginBottom: 22,
+    marginBottom: 6,
     fontWeight: '500',
     color: Colors.black,
+  },
+  textDescription: {
+    fontSize: 16,
+    marginBottom: 16,
+    color: Colors.black,
+    fontStyle: 'italic',
   },
   buttonSignup: {
     marginTop: 80,
