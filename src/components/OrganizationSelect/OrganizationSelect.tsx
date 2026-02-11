@@ -15,15 +15,9 @@ type Props = {
   style?: StyleProp<ViewStyle>;
   organization: Organization;
   onPress: (organization: Organization) => void;
-  onSearch: () => void;
 };
 
-export const OrganizationSelect = ({
-  style,
-  organization,
-  onPress,
-  onSearch,
-}: Props) => {
+export const OrganizationSelect = ({ style, organization, onPress }: Props) => {
   return (
     <View style={[styles.container, style]}>
       <TouchableOpacity
@@ -31,10 +25,7 @@ export const OrganizationSelect = ({
         onPress={() => onPress(organization)}>
         <Image source={{ uri: organization.imageUrl }} style={styles.icon} />
         <Text style={styles.text}>{organization.name}</Text>
-        <Image source={Images.Dropdown} />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onSearch}>
-        <Image source={Images.Search} style={styles.iconSearch} />
+        {/* <Image style={styles.dropdown} source={Images.Dropdown} /> */}
       </TouchableOpacity>
     </View>
   );

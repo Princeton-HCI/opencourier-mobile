@@ -9,7 +9,6 @@ import { UserStatusSelector } from '@app/components/UserStatusSelector/UserStatu
 import { SideMenuItemSwitch } from '@app/components/SideMenuItemSwitch/SideMenuItemSwitch';
 import { SideMenuItemPlain } from '@app/components/SideMenuItemPlain/SideMenuItemPlain';
 import { OrganizationSelect } from '@app/components/OrganizationSelect/OrganizationSelect';
-import { TEST_ORG_ARRAY } from '@app/utilities/testData';
 import {
   getSelectedOrganizationStorage,
   setSelectedOrganizationStorage,
@@ -27,6 +26,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useUser from '@app/hooks/useUser';
 import { useQueryClient } from '@tanstack/react-query';
 import { services } from '@app/services/service';
+import useInstance from '@app/hooks/useInstance';
 
 type Props = RootScreenProp<RootScreen.Loading>;
 
@@ -53,14 +53,17 @@ export const SideMenu = ({ navigation }: Props) => {
   const [autoAcceptOrders, setAutoAcceptOrders] = useState<boolean>(
     user?.deliverySetting === OrderSetting.auto_accept,
   );
-  const [selectedOrg, setSelectedOrg] = useState<Organization>(
-    TEST_ORG_ARRAY[0],
+  const [selectedOrg, setSelectedOrg] = useState<Organization | undefined>(
+    undefined,
   );
   const [status, setStatus] = useState<string | undefined>(user?.status);
   const { watchId, setWatchId } = useContext(UserContext);
 
   const { updateStatus, updateDeliverySettings, updateUserLocation } =
     useUser();
+
+  // Fetch user instances
+  const { userInstances, isLoadingInstances } = useInstance();
 
   const isSwitchOn = (item: SideMenuItem) => {
     switch (item) {
@@ -110,14 +113,31 @@ export const SideMenu = ({ navigation }: Props) => {
 
   useEffect(() => {
     (async () => {
-      const org = await getSelectedOrganizationStorage();
-      if (org !== undefined) {
-        setSelectedOrg(org);
+      // First, check if we have instances loaded
+      if (userInstances.length > 0) {
+        // Check if we have a stored organization
+        const storedOrg = await getSelectedOrganizationStorage();
+
+        if (storedOrg) {
+          const matchingInstance = userInstances.find(
+            inst => inst.id === storedOrg.id,
+          );
+
+          if (matchingInstance) {
+            setSelectedOrg(matchingInstance);
+          } else {
+            setSelectedOrg(userInstances[0]);
+            setSelectedOrganizationStorage(userInstances[0]);
+          }
+        } else {
+          setSelectedOrg(userInstances[0]);
+          setSelectedOrganizationStorage(userInstances[0]);
+        }
       }
       //const accept = await getAutoAcceptOrdersStorage();
       //setAutoAcceptOrders(accept);
     })();
-  }, []);
+  }, [userInstances]);
 
   useEffect(() => {
     setStatus(user?.status);
@@ -175,33 +195,32 @@ export const SideMenu = ({ navigation }: Props) => {
     });
   };
 
+  // Don't render organization selector if we don't have an organization yet
+  const shouldRenderOrgSelect = selectedOrg && !isLoadingInstances;
+
   return (
     <DrawerContentScrollView>
       <View style={styles.container}>
         <View style={styles.containerProfile}>
           <ProfileBadge
             discreteStatusIndicator
-            userStatus={status}
+            userStatus={status as UserStatus}
             onPress={() => undefined}
           />
           <Text style={styles.textName}>
             {t('translations:hi') + ` ${user!.firstName}!`}
           </Text>
         </View>
-        <OrganizationSelect
-          style={styles.cell}
-          organization={selectedOrg}
-          onPress={() =>
-            navigation.navigate(RootScreen.SelectOrganizationModal, {
-              preselected: selectedOrg,
-              onOrganizationSelect: organizationSelected,
-            })
-          }
-          onSearch={() => undefined}
-        />
+        {shouldRenderOrgSelect && (
+          <OrganizationSelect
+            style={styles.cell}
+            organization={selectedOrg}
+            onPress={() => {}}
+          />
+        )}
         <UserStatusSelector
           style={styles.cell}
-          selected={status}
+          selected={status as UserStatus}
           onPress={onUserStatusSelect}
         />
         <View style={styles.separator} />
