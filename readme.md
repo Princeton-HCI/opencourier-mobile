@@ -8,9 +8,10 @@ https://reactnative.dev/docs/set-up-your-environment
 # 2. Build packaging steps:
 
 ## ios building
-run `npm install` in the home directory  
+make sure the branch is main (production branch)
+run `yarn install` in the home directory (try `yarn install --frozen-lockfile` if you wanna keep the local development consistent) 
 go to the ios directory `cd ios/` and run `pod install`  
-run `react-native run-ios` command   
+run `yarn start` command   
 or open the OpenDeli.xcworkspace file in the ios/ folder in xcode and click the run button on the left column.  
 
 # 3. Licences
