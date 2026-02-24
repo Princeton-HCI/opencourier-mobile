@@ -80,3 +80,4 @@ yarn-error.log
 android/gradle.properties
 ios/GoogleService-Info.plist
 upload_certificate.pem
+ios/Podfile.lock

@@ -61,14 +61,14 @@ export const LandingScreen = ({ navigation }: Props) => {
         try {
           if (Platform.OS === 'android') {
             const hasPermission = await PermissionsAndroid.check(
-              PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+              PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
             );
             console.log(
-              '[Landing] Android fine location permission check:',
+              '[Landing] Android location permission check:',
               hasPermission,
             );
             if (!hasPermission) {
-              console.warn('[Landing] Fine location permission denied');
+              console.warn('[Landing] location permission denied');
               return;
             }
           }
@@ -90,7 +90,7 @@ export const LandingScreen = ({ navigation }: Props) => {
             (error: any) => {
               console.warn('[Landing] Location error:', error);
             },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
           );
         } catch (error) {
           console.warn('[Landing] Get location error:', error);
