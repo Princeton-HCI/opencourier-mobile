@@ -81,7 +81,7 @@ android {
         applicationId "com.opendeli"
         minSdkVersion rootProject.ext.minSdkVersion
         // targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 22
+        versionCode 23
         versionName "1"
         missingDimensionStrategy 'react-native-camera', 'general'
     }

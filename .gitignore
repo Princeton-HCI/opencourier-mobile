@@ -77,3 +77,6 @@ yarn-error.log
 
 # VS Code
 .vscode/
+android/gradle.properties
+ios/GoogleService-Info.plist
+upload_certificate.pem
