@@ -65,6 +65,18 @@
         "licenseUrl": "https://github.com/axios/axios/raw/master/LICENSE",
         "parents": "opencourier"
     },
+    "fast-xml-parser@5.4.1": {
+        "licenses": "MIT",
+        "repository": "https://github.com/NaturalIntelligence/fast-xml-parser",
+        "licenseUrl": "https://github.com/NaturalIntelligence/fast-xml-parser/raw/master/LICENSE",
+        "parents": "opencourier"
+    },
+    "form-data@4.0.5": {
+        "licenses": "MIT",
+        "repository": "https://github.com/form-data/form-data",
+        "licenseUrl": "https://github.com/form-data/form-data/raw/master/License",
+        "parents": "opencourier"
+    },
     "geojson@0.5.0": {
         "licenses": "MIT",
         "repository": "http://github.com/caseycesari/geojson.js",
@@ -77,10 +89,22 @@
         "licenseUrl": "https://github.com/i18next/i18next/raw/master/LICENSE",
         "parents": "opencourier"
     },
+    "minimatch@3.1.5": {
+        "licenses": "ISC",
+        "repository": "https://github.com/isaacs/minimatch",
+        "licenseUrl": "https://github.com/isaacs/minimatch/raw/master/LICENSE",
+        "parents": "opencourier"
+    },
     "moment@2.30.1": {
         "licenses": "MIT",
         "repository": "https://github.com/moment/moment",
         "licenseUrl": "https://github.com/moment/moment/raw/master/LICENSE",
+        "parents": "opencourier"
+    },
+    "node-forge@1.3.3": {
+        "licenses": "(BSD-3-Clause OR GPL-2.0)",
+        "repository": "https://github.com/digitalbazaar/forge",
+        "licenseUrl": "https://github.com/digitalbazaar/forge/raw/master/LICENSE",
         "parents": "opencourier"
     },
     "patch-package@8.0.0": {
@@ -213,6 +237,12 @@
         "licenses": "MIT",
         "repository": "https://github.com/facebook/react",
         "licenseUrl": "https://github.com/facebook/react/raw/master/LICENSE",
+        "parents": "opencourier"
+    },
+    "semver@5.7.2": {
+        "licenses": "ISC",
+        "repository": "https://github.com/npm/node-semver",
+        "licenseUrl": "https://github.com/npm/node-semver/raw/master/LICENSE",
         "parents": "opencourier"
     },
     "socket.io-client@4.8.1": {
