@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
   useContext,
+  useMemo,
 } from 'react';
 import {
   View,
@@ -41,7 +42,7 @@ type Page = {
 
 export const LandingScreen = ({ navigation }: Props) => {
   const { t } = useTranslation();
-  const { top, bottom } = useSafeAreaInsets();
+  const { bottom } = useSafeAreaInsets();
   const [page, setPage] = useState<number>(0);
   const [permissionRequested, setPermissionRequested] = useState(false);
   const ref = useRef<PagerView>(null);
@@ -102,81 +103,87 @@ export const LandingScreen = ({ navigation }: Props) => {
     }
   }, [locationPermission, setUserLatitude, setUserLongitude]);
 
-  const data: Page[] = [
-    {
-      title: t('translations:support_locals'),
-      description: t('translations:support_locals_details'),
-      image: Images.OnboardingCar,
-    },
-    {
-      title: t('translations:earn_money'),
-      description: t('translations:more_than_a_gig'),
-      image: Images.OnboardingMoped,
-    },
-    {
-      title: t('translations:reach_goals'),
-      description: t('translations:get_paid'),
-      image: Images.OnboardingFood,
-    },
-    {
-      title: t('translations:enable_location'),
-      description: t('translations:enable_location_text'),
-      image: Images.WelcomePin,
-    },
-    {
-      title: t('translations:enable_camera'),
-      description: t('translations:enable_camera_text'),
-      image: Images.WelcomeCam,
-    },
-    {
-      title: t('translations:enable_notifications'),
-      description: t('translations:enable_notifications_text'),
-      image: Images.WelcomeBell,
-    },
-  ];
+  const data: Page[] = useMemo(
+    () => [
+      {
+        title: t('translations:support_locals'),
+        description: t('translations:support_locals_details'),
+        image: Images.OnboardingCar,
+      },
+      {
+        title: t('translations:earn_money'),
+        description: t('translations:more_than_a_gig'),
+        image: Images.OnboardingMoped,
+      },
+      {
+        title: t('translations:reach_goals'),
+        description: t('translations:get_paid'),
+        image: Images.OnboardingFood,
+      },
+      {
+        title: t('translations:enable_location'),
+        description: t('translations:enable_location_text'),
+        image: Images.WelcomePin,
+      },
+      {
+        title: t('translations:enable_camera'),
+        description: t('translations:enable_camera_text'),
+        image: Images.WelcomeCam,
+      },
+      {
+        title: t('translations:enable_notifications'),
+        description: t('translations:enable_notifications_text'),
+        image: Images.WelcomeBell,
+      },
+    ],
+    [t],
+  );
 
-  const onScroll = (position: any) => {
+  const onScroll = useCallback((position: any) => {
     setPage(position.nativeEvent.position);
-  };
+  }, []);
 
-  const onContinue = () => {
+  const onContinue = useCallback(() => {
     if (page === -1) {
-      setPage(0);
       ref.current?.setPage(0);
     } else if (page < data.length - 1) {
-      setPage(page + 1);
       ref.current?.setPage(page + 1);
     } else {
       navigation.navigate(OnboardingScreen.Welcome);
     }
-  };
+  }, [data.length, navigation, page]);
 
-  const getPermissionButtonState = () => {
-    if (page === 3) return locationPermission;
-    if (page === 4) return cameraPermission;
-    if (page === 5) return permissionsGiven;
-    return false;
-  };
-
-  const getPermissionButtonTitle = () => {
-    const isAllowed = getPermissionButtonState();
+  const permissionButtonState = useMemo(() => {
     if (page === 3) {
-      return isAllowed
+      return locationPermission;
+    }
+    if (page === 4) {
+      return cameraPermission;
+    }
+    if (page === 5) {
+      return permissionsGiven;
+    }
+    return false;
+  }, [cameraPermission, locationPermission, page, permissionsGiven]);
+
+  const permissionButtonTitle = useMemo(() => {
+    if (page === 3) {
+      return permissionButtonState
         ? t('translations:location_allowed')
         : t('translations:allow');
     }
     if (page === 4) {
-      return isAllowed
+      return permissionButtonState
         ? t('translations:camera_allowed')
         : t('translations:allow');
     }
     if (page === 5) {
-      return isAllowed
+      return permissionButtonState
         ? t('translations:notifications_allowed')
         : t('translations:allow');
     }
     return t('translations:allow');
-  };
+  }, [page, permissionButtonState, t]);
 
   const onAskForPermission = () => {
     if (page === 3) {
@@ -223,6 +230,7 @@ export const LandingScreen = ({ navigation }: Props) => {
     permissionsGiven,
     permissionRequested,
     page,
+    onContinue,
   ]);
 
   return (
@@ -230,20 +238,23 @@ export const LandingScreen = ({ navigation }: Props) => {
       <Image source={Images.NoiseBG} style={styles.background} />
       <SafeAreaView style={styles.safeArea}>
         <Image source={Images.OpenDeli} style={[styles.imageOpenDeli]} />
-        <PagerView
-          ref={ref}
-          style={styles.pagerView}
-          scrollEnabled={true}
-          initialPage={page}
-          onPageSelected={onScroll}>
-          {data.map(item => (
-            <PageItem
-              title={item.title}
-              description={item.description}
-              image={item.image}
-            />
-          ))}
-        </PagerView>
+        <View style={styles.pagerViewContainer}>
+          <PagerView
+            ref={ref}
+            style={styles.pagerView}
+            scrollEnabled={true}
+            initialPage={0}
+            onPageSelected={onScroll}>
+            {data.map(item => (
+              <PageItem
+                key={item.title}
+                title={item.title}
+                description={item.description}
+                image={item.image}
+              />
+            ))}
+          </PagerView>
+        </View>
         <View style={[styles.containerBottom, { paddingBottom: bottom + 10 }]}>
           <PageIndicator
             variant="beads"
@@ -253,13 +264,13 @@ export const LandingScreen = ({ navigation }: Props) => {
           />
           {page > 2 && (
             <Button
-              style={[styles.buttonContinue, { marginBottom: 22 }]}
+              style={[styles.buttonContinue, styles.buttonContinueSpacing]}
               iconPosition="right"
               type={ButtonType.green}
               icon={Images.CheckWhite}
-              title={getPermissionButtonTitle()}
+              title={permissionButtonTitle}
               onPress={onAskForPermission}
-              disabled={getPermissionButtonState()}
+              disabled={permissionButtonState}
             />
           )}
           <Button
