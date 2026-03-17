@@ -11,9 +11,13 @@ export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  pagerView: {
+  pagerViewContainer: {
     flex: 1,
+  },
+  pagerView: {
     alignItems: 'center',
+    height: '100%',
+    width: '100%',
   },
   imageOpenDeli: {
     margin: 32,
@@ -25,6 +29,9 @@ export const styles = StyleSheet.create({
   buttonContinue: {
     marginHorizontal: 32,
     height: 48,
+  },
+  buttonContinueSpacing: {
+    marginBottom: 22,
   },
   ilustration: {
     width: IMAGE_SIZE,
@@ -49,7 +56,8 @@ export const styles = StyleSheet.create({
     color: Colors.black,
   },
   pageContent: {
-    flex: 1,
+    width: '100%',
+    height: '100%',
     overflow: 'hidden',
   },
   background: {
