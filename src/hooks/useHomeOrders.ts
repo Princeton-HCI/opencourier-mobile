@@ -3,6 +3,7 @@ import { services } from '@app/services/service';
 import { useEffect, useState } from 'react';
 import { AUTO_ACCEPT_DECLINE_TIMER } from '@app/utilities/constants';
 import { OrderSetting } from '@app/types/enums';
+import { filterInProgressOrdersForDisplay } from '@app/utilities/inProgressListFilter';
 import { Alert } from 'react-native';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { QueryKeys } from '@app/utilities/queryKeys';
@@ -56,6 +57,7 @@ export const useHomeOrders = () => {
   } = useQuery({
     queryFn: services.orderService.getInProgressOrders,
     queryKey: [QueryKeys.inProgressOrders],
+    select: filterInProgressOrdersForDisplay,
   });
 
   const {
@@ -137,9 +139,7 @@ export const useHomeOrders = () => {
   }, [newOrders]);
 
   useEffect(() => {
-    if (inProgressOrders) {
-      setDataSourceInProgress(inProgressOrders);
-    }
+    setDataSourceInProgress(inProgressOrders ?? []);
   }, [inProgressOrders]);
 
   useEffect(() => {

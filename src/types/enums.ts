@@ -69,6 +69,7 @@ export enum OrderStatus {
   created = 'CREATED',
   accepted = 'ACCEPTED',
   dispatched = 'DISPATCHED',
+  courier_arrived_at_pickup_location = 'COURIER_ARRIVED_AT_PICKUP_LOCATION',
   picked_up = 'PICKED_UP',
   dropped_off = 'DROPPED_OF',
   canceled = 'CANCELED',

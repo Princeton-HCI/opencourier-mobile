@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleProp,
   ViewStyle,
@@ -34,7 +34,20 @@ export const NextStep = ({
   const { t } = useTranslation();
   const navigation = useNavigation<MainNavigationProp>();
 
-  const { confirmOrderItems } = useOrder();
+  const {
+    confirmOrderItems,
+    arrivedAtPickup,
+    isArrivedAtPickupPending,
+    arrivedAtDropoff,
+    isArrivedAtDropoffPending,
+  } = useOrder();
+
+  /** True after successful "Arrived at pickup" while API may still show ACCEPTED/DISPATCHED. */
+  const [confirmItemsUnlocked, setConfirmItemsUnlocked] = useState(false);
+
+  useEffect(() => {
+    setConfirmItemsUnlocked(false);
+  }, [order.id]);
 
   const userCell = () => {
     if (!order.orderItems) {
@@ -61,12 +74,31 @@ export const NextStep = ({
   };
 
   const onMarkAsDelivered = () => {
-    navigation.navigate(MainScreens.MarkAsDelivered, { order: order });
+    arrivedAtDropoff(order.id, {
+      onSuccess: () =>
+        navigation.navigate(MainScreens.MarkAsDelivered, { order }),
+    });
   };
 
-  const isDispatched =
+  const showPrePickupActions =
     order.status === OrderStatus.dispatched ||
-    order.status === OrderStatus.accepted;
+    order.status === OrderStatus.accepted ||
+    order.status === OrderStatus.courier_arrived_at_pickup_location;
+
+  /** Order is already dispatched on the server — skip redundant mark-as-dispatched before pickup. */
+  const isAlreadyDispatchedForConfirm =
+    order.status === OrderStatus.dispatched ||
+    order.status === OrderStatus.courier_arrived_at_pickup_location;
+
+  const isCourierArrivedAtPickup =
+    order.status === OrderStatus.courier_arrived_at_pickup_location;
+
+  const showConfirmOrderItems =
+    showPrePickupActions &&
+    (isCourierArrivedAtPickup || confirmItemsUnlocked);
+
+  const showArrivedAtPickupButton =
+    showPrePickupActions && !isCourierArrivedAtPickup && !confirmItemsUnlocked;
 
   return (
     <View style={styles.nextStep}>
@@ -75,15 +107,28 @@ export const NextStep = ({
         <Image source={Images.ArrowsForward} />
         <Text style={styles.textNextStep}>Next Step</Text>
       </View>
-      {/* {isDispatched && (
+      {/* {showPrePickupActions && (
         <Toast
           toast={ToastMessage.get_closer}
           disableClose
           style={{ marginBottom: 10 }}
         />
       )} */}
-      {isDispatched && userCell()}
-      {isDispatched && (
+      {showPrePickupActions && userCell()}
+      {showArrivedAtPickupButton && (
+        <Button
+          style={{ marginHorizontal: 12, marginTop: 10 }}
+          type={ButtonType.green}
+          title={t('translations:arrived_at_pickup')}
+          onPress={() =>
+            arrivedAtPickup(order.id, {
+              onSuccess: () => setConfirmItemsUnlocked(true),
+            })
+          }
+          isLoading={isArrivedAtPickupPending}
+        />
+      )}
+      {showConfirmOrderItems && (
         <Button
           style={{ marginHorizontal: 12, marginTop: 10 }}
           type={ButtonType.green}
@@ -92,7 +137,7 @@ export const NextStep = ({
           onPress={() => {
             confirmOrderItems({
               id: order.id,
-              isDispatched: order.status === OrderStatus.dispatched,
+              isDispatched: isAlreadyDispatchedForConfirm,
             });
           }}
         />
@@ -105,6 +150,7 @@ export const NextStep = ({
             icon={Images.CheckWhite}
             title={t('translations:mark_as_delivered')}
             onPress={onMarkAsDelivered}
+            isLoading={isArrivedAtDropoffPending}
           />
           <Button
             style={{ marginHorizontal: 12, marginTop: 10 }}

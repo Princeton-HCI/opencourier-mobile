@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { metersToMiles } from '@app/utilities/geo';
 import { secondsToMinutes } from '@app/utilities/dates';
 import { getDistance } from '@app/utilities/geo';
-import { currencyFormatter } from '@app/utilities/currency';
+import { formatCurrencyFromCents } from '@app/utilities/currency';
 import {
   AUTO_ACCEPT_DECLINE_TIMER,
   SCREEN_WIDTH,
@@ -90,7 +90,12 @@ export const NewOrderCell = ({
 
   return (
     <View style={[styles.container, style]}>
-      <Text style={styles.textPrice}>{currencyFormatter(order.totalCost)}</Text>
+      <Text style={styles.textPrice}>
+        {formatCurrencyFromCents(
+          order.totalCompensation,
+          order.currencyCode,
+        )}
+      </Text>
       <View style={styles.separator} />
       <View style={styles.content}>
         <View style={styles.containerLeft}>
@@ -101,9 +106,11 @@ export const NewOrderCell = ({
         <View style={styles.containerRight}>
           <View style={styles.containerAddressButton}>
             <View style={styles.containerText}>
-              <Text style={styles.textName}>{order.pickupName}</Text>
-              <Text style={styles.textAddress}>
-                {order.pickupLocation.formattedAddress}
+              <Text style={styles.textName}>
+                {order.pickupLocationFormattedAddress ??
+                  order.pickupLocation?.formattedAddress ??
+                  order.pickupName ??
+                  'N/A'}
               </Text>
             </View>
             <TouchableOpacity onPress={() => onCopyRestaurant(order)}>
@@ -132,9 +139,11 @@ export const NewOrderCell = ({
           </View>
           <View style={styles.containerAddressButton}>
             <View style={styles.containerText}>
-              <Text style={styles.textName}>{order.dropoffName}</Text>
-              <Text style={styles.textAddress}>
-                {order.dropoffLocation.formattedAddress}
+              <Text style={styles.textName}>
+                {order.dropoffLocationFormattedAddress ??
+                  order.dropoffLocation?.formattedAddress ??
+                  order.dropoffName ??
+                  'N/A'}
               </Text>
             </View>
             <TouchableOpacity onPress={() => onCopyCustomer(order)}>

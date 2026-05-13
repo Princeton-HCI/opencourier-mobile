@@ -37,27 +37,27 @@ const Map = ({ user, order }: Props) => {
             longitude: user.currentLocation?.longitude ?? -0.1584647405195857,
           },
           {
-            latitude: order.pickupLocation.latitude ?? 0,
-            longitude: order.pickupLocation.longitude ?? 0,
+            latitude: order.pickupLocation?.latitude ?? 0,
+            longitude: order.pickupLocation?.longitude ?? 0,
           },
           {
-            latitude: order.dropoffLocation.latitude ?? 0,
-            longitude: order.dropoffLocation.longitude ?? 0,
+            latitude: order.dropoffLocation?.latitude ?? 0,
+            longitude: order.dropoffLocation?.longitude ?? 0,
           },
         ]}
       />
       <Marker
         key={1}
         coordinate={{
-          latitude: order.dropoffLocation.latitude ?? 0,
-          longitude: order.dropoffLocation.longitude ?? 0,
+          latitude: order.dropoffLocation?.latitude ?? 0,
+          longitude: order.dropoffLocation?.longitude ?? 0,
         }}
         image={Images.Buildings}
       />
       <Marker
         coordinate={{
-          latitude: order.pickupLocation.latitude ?? 0,
-          longitude: order.pickupLocation.longitude ?? 0,
+          latitude: order.pickupLocation?.latitude ?? 0,
+          longitude: order.pickupLocation?.longitude ?? 0,
         }}
         image={Images.Storefront}
       />

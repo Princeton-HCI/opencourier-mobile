@@ -14,8 +14,36 @@ const useOrder = () => {
     onError: error => Alert.alert('Error confirming items', error.message),
   });
 
+  const { mutate: arrivedAtPickup, isPending: isArrivedAtPickupPending } =
+    useMutation({
+      mutationFn: services.orderService.arrivedAtPickup,
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeys.inProgressOrders],
+        });
+      },
+      onError: error =>
+        Alert.alert('Error marking arrived at pickup', error.message),
+    });
+
+  const { mutate: arrivedAtDropoff, isPending: isArrivedAtDropoffPending } =
+    useMutation({
+      mutationFn: services.orderService.arrivedAtDropoff,
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeys.inProgressOrders],
+        });
+      },
+      onError: error =>
+        Alert.alert('Error marking arrived at dropoff', error.message),
+    });
+
   return {
     confirmOrderItems,
+    arrivedAtPickup,
+    isArrivedAtPickupPending,
+    arrivedAtDropoff,
+    isArrivedAtDropoffPending,
   };
 };
 

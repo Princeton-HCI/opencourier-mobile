@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Image,
   StyleProp,
   Text,
   TouchableOpacity,

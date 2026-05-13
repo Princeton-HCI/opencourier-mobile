@@ -13,6 +13,7 @@ import { EarningsTabItem } from '@app/types/types';
 import moment, { Moment } from 'moment';
 import { endOfWeek, formatEarnings, startOfWeek } from '@app/utilities/dates';
 import { useTranslation } from 'react-i18next';
+import { formatCurrencyFromCents } from '@app/utilities/currency';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
@@ -60,7 +61,9 @@ export const WeekSelector = ({
         </TouchableOpacity>
       )}
       <View style={styles.containerText}>
-        <Text style={styles.textPrice}>{`$${earned}`}</Text>
+        <Text style={styles.textPrice}>
+          {formatCurrencyFromCents(earned, 'USD')}
+        </Text>
         <Text style={styles.textDate}>{date}</Text>
         <View style={styles.separator} />
       </View>

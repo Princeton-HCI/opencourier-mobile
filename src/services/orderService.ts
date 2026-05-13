@@ -1,5 +1,5 @@
 import { UClient } from './Client';
-import { OrderServiceParams, OrderServiceReponse } from './types';
+import { OrderServiceReponse } from './types';
 
 export interface OrderService {
   getNewOrders: () => Promise<OrderServiceReponse>;
@@ -11,6 +11,8 @@ export interface OrderService {
     id: string;
     isDispatched: boolean;
   }) => Promise<OrderServiceReponse>;
+  arrivedAtPickup: (id: string) => Promise<OrderServiceReponse>;
+  arrivedAtDropoff: (id: string) => Promise<OrderServiceReponse>;
   markAsDelivered: (params: {
     id: string;
     note: string;
@@ -55,6 +57,16 @@ const orderService = (client: UClient): OrderService => {
     return client.post(`deliveries/${id}/mark-as-picked-up`);
   };
 
+  const arrivedAtPickup = async (id: string): Promise<OrderServiceReponse> => {
+    return client.post(`deliveries/${id}/arrived-at-pickup`, {});
+  };
+
+  const arrivedAtDropoff = async (
+    id: string,
+  ): Promise<OrderServiceReponse> => {
+    return client.post(`deliveries/${id}/arrived-at-dropoff`, {});
+  };
+
   const markAsDelivered = async (params: {
     id: string;
     note: string;
@@ -73,6 +85,8 @@ const orderService = (client: UClient): OrderService => {
     getInProgressOrders,
     acceptOrder,
     confirmItems,
+    arrivedAtPickup,
+    arrivedAtDropoff,
     markAsDelivered,
     declineOrder,
   };

@@ -17,6 +17,7 @@ import { Images } from '@app/utilities/images';
 import { TEST_EARNINGS_ORDERS } from '@app/utilities/testData';
 import { Button, ButtonType } from '@app/components/Button/Button';
 import { formatMockDate } from '@app/utilities/dates';
+import { formatCurrencyFromCents } from '@app/utilities/currency';
 import { MainScreens } from '@app/navigation/main/types';
 import { useTranslation } from 'react-i18next';
 
@@ -202,7 +203,9 @@ export const Earnings = ({ navigation }: Props) => {
         </View>
         <View style={styles.containerEarnings}>
           <View style={styles.earningsText}>
-            <Text style={styles.textEarned}>{`$${totalEarnings}`}</Text>
+            <Text style={styles.textEarned}>
+              {formatCurrencyFromCents(totalEarnings, 'USD')}
+            </Text>
             <Text style={styles.textCount}>{headerTitle}</Text>
           </View>
           <Cashout onPress={() => undefined} />

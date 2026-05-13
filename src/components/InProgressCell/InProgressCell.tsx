@@ -87,7 +87,9 @@ export const InProgressCell = ({
                 onCopyAddress={() => onMessageRestaurant(order)}
                 expanded={topExpanded}
               />
-              {order.status === OrderStatus.dispatched && (
+              {(order.status === OrderStatus.dispatched ||
+                order.status ===
+                  OrderStatus.courier_arrived_at_pickup_location) && (
                 <InProgressMap
                   order={order}
                   user={user!}

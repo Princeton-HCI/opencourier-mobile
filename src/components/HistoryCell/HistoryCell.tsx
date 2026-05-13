@@ -14,7 +14,7 @@ import moment from 'moment';
 import { formatTime, formatServer, formatSpaced } from '@app/utilities/dates';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonType } from '../Button/Button';
-import { currencyFormatter } from '@app/utilities/currency';
+import { formatCurrencyFromCents } from '@app/utilities/currency';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
@@ -49,7 +49,10 @@ export const HistoryCell = ({ style, order, onPress }: Props) => {
           <View style={styles.containerCarret}>
             <View style={styles.containerStatus}>
               <Text style={styles.textStatus}>
-                {currencyFormatter(order.totalCompensation ?? 0)}
+                {formatCurrencyFromCents(
+                  order.totalCompensation ?? 0,
+                  order.currencyCode,
+                )}
               </Text>
             </View>
             <Image
@@ -71,19 +74,25 @@ export const HistoryCell = ({ style, order, onPress }: Props) => {
           <View style={[styles.containerInfo]}>
             <Image source={Images.Storefront} style={styles.iconSmall} />
             <Text style={styles.textInfo}>
-              {order.pickupBusinessName ?? 'N/A'}
+              {order.pickupBusinessName?? 'N/A'}
             </Text>
           </View>
           <View style={[styles.containerInfo]}>
-            <Image source={Images.HandCoins} style={styles.iconSmall} />
+            <Image source={Images.Storefront} style={styles.iconSmall} />
             <Text style={styles.textInfo}>
-              {currencyFormatter(order?.fee ?? 0)}
+              {order.dropoffLocationFormattedAddress ?? 'N/A'}
             </Text>
           </View>
+          {/* <View style={[styles.containerInfo]}>
+            <Image source={Images.HandCoins} style={styles.iconSmall} />
+            <Text style={styles.textInfo}>
+              {formatCurrencyFromCents(order?.fee ?? 0, order.currencyCode)}
+            </Text>
+          </View> */}
           <View style={styles.containerInfo}>
             <Image source={Images.HandHeart} style={styles.iconSmall} />
             <Text style={styles.textInfo}>
-              {currencyFormatter(order.tips ?? 0)}
+              {formatCurrencyFromCents(order.tips ?? 0, order.currencyCode)}
             </Text>
           </View>
           <Button

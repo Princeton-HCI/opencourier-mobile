@@ -191,6 +191,7 @@ export default {
   accept: 'Accept',
   decline_now: 'Decline Now',
   contact_restaurant: 'Contact restaurant',
+  arrived_at_pickup: 'Arrived at pickup',
   confirm_items: 'Confirm Order Items',
   contact_customer: 'Contact customer',
   mark_as_delivered: 'Mark as delivered',

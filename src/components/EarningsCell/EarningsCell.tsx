@@ -5,6 +5,7 @@ import { Moment } from 'moment';
 import { nameOfDay, shortDate } from '@app/utilities/dates';
 import { Colors } from '@app/styles/colors';
 import { useTranslation } from 'react-i18next';
+import { formatCurrencyFromCents } from '@app/utilities/currency';
 
 type Props = {
   style?: StyleProp<ViewStyle>;
@@ -36,7 +37,9 @@ export const EarningsCell = ({
       <View style={styles.containerText}>
         {restaurantName && <Text style={styles.text}>{restaurantName}</Text>}
         {!restaurantName && <Text style={styles.text}>{shortDate(date)}</Text>}
-        <Text style={styles.text}>{`$${earned}`}</Text>
+        <Text style={styles.text}>
+          {formatCurrencyFromCents(earned, 'USD')}
+        </Text>
       </View>
     </View>
   );

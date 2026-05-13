@@ -260,6 +260,8 @@ export type Order = {
   createdAt: string;
   pickupLocationNotes: Note[];
   dropOffLocationNotes: Note[];
+  pickupLocationFormattedAddress?: string;
+  dropoffLocationFormattedAddress?: string;
   pickupLocation: Location;
   dropoffLocation: Location;
 };

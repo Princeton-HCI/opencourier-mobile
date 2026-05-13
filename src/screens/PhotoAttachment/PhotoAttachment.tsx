@@ -7,6 +7,7 @@ import {
   Text,
   Linking,
   Platform,
+  Alert,
 } from 'react-native';
 import { Images } from '@app/utilities/images';
 import { styles } from './PhotoAttachment.styles';
@@ -17,7 +18,7 @@ import {
 } from '@app/components/BackNavButton/BackNavButton';
 import { Button, ButtonType } from '@app/components/Button/Button';
 import { Colors } from '@app/styles/colors';
-import { RNCamera, FaceDetector } from 'react-native-camera';
+import { RNCamera } from 'react-native-camera';
 import { check, PERMISSIONS, request } from 'react-native-permissions';
 
 enum ScreenState {
@@ -34,6 +35,7 @@ export const PhotoAttachment = ({ navigation, route }: Props) => {
   );
   const [flashOn, setFlashOn] = useState<boolean>(false);
   const [photoPath, setPhotoPath] = useState<string | undefined>(undefined);
+  const [cameraReady, setCameraReady] = useState(false);
   const { onAttach } = route.params;
   const camera = useRef<RNCamera>(null);
 
@@ -102,11 +104,27 @@ export const PhotoAttachment = ({ navigation, route }: Props) => {
   }, []);
 
   const takePhoto = async () => {
-    const options = { base64: false };
-    const data = await camera.current?.takePictureAsync(options);
-    if (data?.uri) {
-      setPhotoPath(data?.uri);
-      setScreenState(ScreenState.photoTaken);
+    if (!camera.current || !cameraReady) {
+      Alert.alert(
+        'Camera',
+        'The camera is still starting. Please wait a moment and try again.',
+      );
+      return;
+    }
+    try {
+      const options = {
+        base64: false,
+        quality: 0.9,
+        ...(Platform.OS === 'android' ? { skipProcessing: true } : {}),
+      };
+      const data = await camera.current.takePictureAsync(options);
+      if (data?.uri) {
+        setPhotoPath(data.uri);
+        setScreenState(ScreenState.photoTaken);
+      }
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      Alert.alert('Could not take photo', message);
     }
   };
 
@@ -153,6 +171,7 @@ export const PhotoAttachment = ({ navigation, route }: Props) => {
                 style={styles.containerRetake}
                 onPress={() => {
                   setPhotoPath(undefined);
+                  setCameraReady(false);
                   setScreenState(ScreenState.takingPhoto);
                 }}>
                 <Image source={Images.ArrowCounterClockwise} />
@@ -167,7 +186,20 @@ export const PhotoAttachment = ({ navigation, route }: Props) => {
               ref={camera}
               style={styles.camera}
               type={RNCamera.Constants.Type.back}
-              flashMode={RNCamera.Constants.FlashMode.on}
+              captureAudio={false}
+              flashMode={
+                flashOn
+                  ? RNCamera.Constants.FlashMode.torch
+                  : RNCamera.Constants.FlashMode.off
+              }
+              onCameraReady={() => setCameraReady(true)}
+              onMountError={e => {
+                const err = e?.nativeEvent as { message?: string } | undefined;
+                Alert.alert(
+                  'Camera error',
+                  err?.message ?? 'Could not start the camera.',
+                );
+              }}
             />
             <Text style={styles.textAttach}>
               Show the customer where you left the order.
@@ -176,7 +208,8 @@ export const PhotoAttachment = ({ navigation, route }: Props) => {
               <View style={styles.placeholder} />
               <TouchableOpacity
                 style={styles.containerButtonOk}
-                onPress={takePhoto}>
+                onPress={takePhoto}
+                disabled={!cameraReady}>
                 <View style={styles.containerCheckmark}>
                   <Image source={Images.CameraBlack} style={styles.checkmark} />
                 </View>

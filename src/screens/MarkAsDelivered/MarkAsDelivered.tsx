@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { RootScreen } from '@app/navigation/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '@app/utilities/queryKeys';
+import { hideInProgressOrderAfterDelivery } from '@app/utilities/inProgressListFilter';
 
 type Props = MainScreenProp<MainScreens.MarkAsDelivered>;
 
@@ -57,10 +58,16 @@ export const MarkAsDelivered = ({ navigation, route }: Props) => {
 
   const { mutate: markAsDelivered, isPending } = useMutation({
     mutationFn: services.orderService.markAsDelivered,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QueryKeys.inProgressOrders, QueryKeys.orderHistory],
-      });
+    onSuccess: async () => {
+      hideInProgressOrderAfterDelivery(order.id);
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeys.inProgressOrders],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeys.orderHistory],
+        }),
+      ]);
       navigation.goBack();
     },
     onError: error => Alert.alert('Error marking as delivered', error.message),

@@ -121,10 +121,18 @@ export const HomeScreen = ({ navigation }: Props) => {
             onAccept={order => acceptOrderFn(order.id)}
             onDecline={order => declineOrderFn(order.id)}
             onCopyCustomer={order =>
-              Clipboard.setString(order.dropoffLocation.formattedAddress)
+              Clipboard.setString(
+                order.dropoffLocationFormattedAddress ??
+                  order.dropoffLocation?.formattedAddress ??
+                  '',
+              )
             }
             onCopyRestaurant={order =>
-              Clipboard.setString(order.pickupLocation.formattedAddress)
+              Clipboard.setString(
+                order.pickupLocationFormattedAddress ??
+                  order.pickupLocation?.formattedAddress ??
+                  '',
+              )
             }
           />
         );
@@ -136,10 +144,18 @@ export const HomeScreen = ({ navigation }: Props) => {
         return (
           <InProgressCell
             onMessageCustomer={order =>
-              Clipboard.setString(order.dropoffLocation.formattedAddress)
+              Clipboard.setString(
+                order.dropoffLocationFormattedAddress ??
+                  order.dropoffLocation?.formattedAddress ??
+                  '',
+              )
             }
             onMessageRestaurant={order =>
-              Clipboard.setString(order.pickupLocation.formattedAddress)
+              Clipboard.setString(
+                order.pickupLocationFormattedAddress ??
+                  order.pickupLocation?.formattedAddress ??
+                  '',
+              )
             }
             onCallCustomer={() =>
               Linking.openURL(`tel://${item.dropoffPhoneNumber}`)

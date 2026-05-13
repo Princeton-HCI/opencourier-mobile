@@ -1013,7 +1013,7 @@ PODS:
     - React
   - react-native-maps (1.8.0):
     - React-Core
-  - react-native-pager-view (6.7.0):
+  - react-native-pager-view (6.9.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1268,7 +1268,7 @@ PODS:
     - React-utils (= 0.74.0)
   - RNCAsyncStorage (1.24.0):
     - React-Core
-  - RNCClipboard (1.16.2):
+  - RNCClipboard (1.16.3):
     - React-Core
   - RNFBApp (18.9.0):
     - Firebase/CoreOnly (= 10.20.0)
@@ -1613,7 +1613,7 @@ SPEC CHECKSUMS:
   react-native-date-picker: 5ddb34db03afc527bc07777952c2ac72fa384411
   react-native-geolocation-service: 32b2c2a3b91e70ce2a8d0c684801aaeb0a07e0ec
   react-native-maps: c578fc7f95580480e3e6bf132b144414a082d672
-  react-native-pager-view: 0cbd814fe1258620729f8cff51fe65cbcdb72d32
+  react-native-pager-view: eea83249a6a479e36351281e158be0dec409550a
   react-native-restart: 0bc732f4461709022a742bb29bcccf6bbc5b4863
   react-native-safe-area-context: 758e894ca5a9bd1868d2a9cfbca7326a2b6bf9dc
   React-nativeconfig: fef0a46effa630d72f137636a990d7df2f6a5f7c
@@ -1640,7 +1640,7 @@ SPEC CHECKSUMS:
   React-utils: 0f71d5cff6548ba0228f8d337a512ea0e9de4538
   ReactCommon: cb3b44918cda4534d7e2ca944afae7e36a26e9ee
   RNCAsyncStorage: b6410dead2732b5c72a7fdb1ecb5651bbcf4674b
-  RNCClipboard: e1d17c9d093d8129ef50b39b63a17a0e8ccd0ade
+  RNCClipboard: f6679d470d0da2bce2a37b0af7b9e0bf369ecda5
   RNFBApp: aadada421dfe12b21692f6973e9501f45b0057ce
   RNFBMessaging: 66535c56b29b5c111deb3e61999069345f1ebe74
   RNGestureHandler: 6572a5f44759900730562b418da289c373de8d06
@@ -1649,7 +1649,7 @@ SPEC CHECKSUMS:
   RNReanimated: 10cd368eb8638808e83f9d4025064ea4fe2550b5
   RNScreens: 9ffe14a19aa4fecfe49ead4cfea952cba63e02f5
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: 3f9165051bbc60b66f6a88c5eeafd9e9faa29500
+  Yoga: d97d4830fe26d7abad29a92f2b11012d2e1f58d1
 
 PODFILE CHECKSUM: a442996009fe403dbd25b6cb4a5700ac47e9363c
 
